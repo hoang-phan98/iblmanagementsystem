@@ -4,7 +4,7 @@ from rest_framework import serializers
 class RetrieveStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["given_name", "family_name", "course", "supervisor", "placement_set"]
+        fields = ["given_name", "family_name", "course", "supervisor", "placement_set", "application_set"]
 
 class RetrieveCourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,7 +19,7 @@ class RetrieveSupervisorSerializer(serializers.ModelSerializer):
 class RetrievePlacementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Placement
-        fields = ["semester", "year", "role", "department", "student_id", "company_id"]
+        fields = ["semester", "year", "role", "department", "student", "company"]
 
 class RetrieveCompanySerializer(serializers.ModelSerializer):
     class Meta:

@@ -6,10 +6,30 @@ class Course(models.Model):
     course_code = models.CharField(max_length=7)
     course_name = models.CharField(max_length=255)
 
+class Interview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    time = models.DateTimeField()
+    location = models.CharField(max_length=256)
+    outcome = models.CharField(max_length=16)
+
 class Supervisor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
+
+class Student(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    given_name = models.CharField(max_length=256)
+    family_name = models.CharField(max_length=256)
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
+
+class Company(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    company_name = models.CharField(max_length=256)
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
 
 class Placement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -17,21 +37,8 @@ class Placement(models.Model):
     year = models.IntegerField()
     role = models.CharField(max_length=256)
     department = models.CharField(max_length=256)
-    student_id = models.IntegerField()
-    company_id = models.IntegerField()
-
-class Student(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
-    placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
-    given_name = models.CharField(max_length=256)
-    family_name = models.CharField(max_length=256)
-
-class Company(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    company_name = models.CharField(max_length=256)
-    placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
 class Unit(models.Model):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -49,13 +56,4 @@ class Application(models.Model):
     status = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-
-class Interview(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    time = models.DateTimeField()
-    location = models.CharField(max_length=256)
-    outcome = models.CharField(max_length=16)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
