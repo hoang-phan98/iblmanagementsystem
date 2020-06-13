@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from core.api.serializers import RetrieveCourseSerializer, RetrieveStudentSerializer, RetrieveSupervisorSerializer
-from core.models import Student, Course, Supervisor
+from .serializers import *
+from ..models import *
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -9,6 +9,46 @@ class StudentViewSet(viewsets.GenericViewSet,
 
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class CourseViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Course.objects.all()
+    serializer_class = RetrieveCourseSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class SupervisorViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Supervisor.objects.all()
+    serializer_class = RetrieveSupervisorSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class CompanyViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Company.objects.all()
+    serializer_class = RetrieveCompanySerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class PlacementViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Placement.objects.all()
+    serializer_class = RetrievePlacementSerializer
 
     def get_paginated_response(self, data):
         return Response(data)
