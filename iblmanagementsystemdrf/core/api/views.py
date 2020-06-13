@@ -52,3 +52,23 @@ class PlacementViewSet(viewsets.GenericViewSet,
 
     def get_paginated_response(self, data):
         return Response(data)
+
+class UnitViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Unit.objects.all()
+    serializer_class = RetrieveUnitSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class ApplicationViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Application.objects.all()
+    serializer_class = RetrieveUnitSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)

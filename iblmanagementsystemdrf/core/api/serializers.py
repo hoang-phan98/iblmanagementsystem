@@ -1,4 +1,4 @@
-from ..models import Course, Supervisor, Student, Placement, Company
+from ..models import *
 from rest_framework import serializers
 
 class RetrieveStudentSerializer(serializers.ModelSerializer):
@@ -25,3 +25,18 @@ class RetrieveCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ["company_name", "placement_set"]
+
+class RetrieveUnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Unit
+        fields = ["code", "name", "year", "semester", "is_ibl_unit"]
+
+class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnitCourse
+        fields = ["unit_set", "course_set"]
+
+class RetrieveApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ["status", "student", "unit"]

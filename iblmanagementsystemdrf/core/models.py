@@ -32,3 +32,20 @@ class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_name = models.CharField(max_length=256)
     placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
+
+class Unit(models.Model):
+    code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=256)
+    year = models.IntegerField()
+    semester = models.IntegerField()
+    is_ibl_unit = models.BooleanField()
+
+class UnitCourse(models.Model):
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    course = models.ForeignKey(Placement, on_delete=models.CASCADE)
+
+class Application(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    status = models.CharField(max_length=256)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
