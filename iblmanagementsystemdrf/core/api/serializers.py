@@ -40,3 +40,8 @@ class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = ["status", "student", "unit"]
+
+class RetrieveInterviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interview
+        fields = ["time", "location", "outcome", "student_set", "application_set", "supervisor_set", "company_set"]

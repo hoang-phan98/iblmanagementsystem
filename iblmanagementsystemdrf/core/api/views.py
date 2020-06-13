@@ -72,3 +72,13 @@ class ApplicationViewSet(viewsets.GenericViewSet,
 
     def get_paginated_response(self, data):
         return Response(data)
+
+class InterviewViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Interview.objects.all()
+    serializer_class = RetrieveInterviewSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)

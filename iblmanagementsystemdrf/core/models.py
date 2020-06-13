@@ -49,3 +49,13 @@ class Application(models.Model):
     status = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+
+class Interview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    time = models.DateTimeField()
+    location = models.CharField(max_length=256)
+    outcome = models.CharField(max_length=16)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
