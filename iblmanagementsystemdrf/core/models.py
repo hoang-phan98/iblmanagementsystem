@@ -24,7 +24,7 @@ class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
-    placement = models.ForeignKey(Placement, on_delete=models.CASCADE, default="")
+    placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
 
