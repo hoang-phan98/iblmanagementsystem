@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Course, Interview, Supervisor, Student, Company, Placement, Unit, UnitCourse, Application
+from .models import *
 
 # Register your models here.
 # class ProductAdmin(admin.ModelAdmin):
@@ -15,3 +15,6 @@ admin.site.register(Placement)
 admin.site.register(Unit)
 admin.site.register(UnitCourse)
 admin.site.register(Application)
+# admin.site.register(PrereqConjunction)
+admin.site.register(Activity)
+admin.site.register(EligibilityRules)

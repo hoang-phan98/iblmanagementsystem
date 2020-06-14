@@ -4,7 +4,8 @@ from rest_framework import serializers
 class RetrieveStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["given_name", "family_name", "course", "supervisor", "placement_set", "application_set"]
+        fields = ["id", "given_name", "family_name", "course", "supervisor", "WAM", "credit_points",
+                  "interview_set", "placement_set", "application_set"]
 
 class RetrieveCourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,7 +15,7 @@ class RetrieveCourseSerializer(serializers.ModelSerializer):
 class RetrieveSupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supervisor
-        fields = ["given_name", "family_name", "student_set"]
+        fields = ["id", "given_name", "family_name", "student_set", "interview_set"]
 
 class RetrievePlacementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +25,7 @@ class RetrievePlacementSerializer(serializers.ModelSerializer):
 class RetrieveCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ["company_name", "placement_set"]
+        fields = ["company_name"]
 
 class RetrieveUnitSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,7 +35,7 @@ class RetrieveUnitSerializer(serializers.ModelSerializer):
 class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UnitCourse
-        fields = ["unit_set", "course_set"]
+        fields = ["unit", "course"]
 
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,4 +45,20 @@ class RetrieveApplicationSerializer(serializers.ModelSerializer):
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
-        fields = ["time", "location", "outcome", "student_set", "application_set", "supervisor_set", "company_set"]
+        fields = ["time", "location", "outcome_details", "student", "application", "company", "staff"]
+
+class RetrieveEligibilityRulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EligibilityRules
+        fields = ["unit"]
+
+class RetrieveActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ["id"]
+
+# class RetrievePrereqConjunction(serializers.ModelSerializer):
+#     class Meta:
+#         model = PrereqConjunction
+#         fields = ["unit_code"]
+

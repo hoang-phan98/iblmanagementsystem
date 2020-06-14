@@ -82,3 +82,43 @@ class InterviewViewSet(viewsets.GenericViewSet,
 
     def get_paginated_response(self, data):
         return Response(data)
+
+class UnitCourseViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = UnitCourse.objects.all()
+    serializer_class = RetrieveUnitCourseSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class EligibilityRulesViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = EligibilityRules.objects.all()
+    serializer_class = RetrieveEligibilityRulesSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+class ActivityViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = Activity.objects.all()
+    serializer_class = RetrieveActivitySerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+# class PrereqConjunctionViewSet(viewsets.GenericViewSet,
+#                    mixins.ListModelMixin,
+#                    mixins.RetrieveModelMixin):
+#
+#     queryset = PrereqConjunction.objects.all()
+#     serializer_class = RetrievePrereqConjunction
+#
+#     def get_paginated_response(self, data):
+#         return Response(data)
