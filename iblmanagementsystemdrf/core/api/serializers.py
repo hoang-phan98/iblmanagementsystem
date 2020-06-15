@@ -10,7 +10,7 @@ class RetrieveStudentSerializer(serializers.ModelSerializer):
 class RetrieveCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ["course_code", "course_name", "student_set"]
+        fields = ["code", "course_name", "student_set"]
 
 class RetrieveSupervisorSerializer(serializers.ModelSerializer):
     class Meta:
