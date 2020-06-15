@@ -25,7 +25,7 @@ class Supervisor(models.Model):
     family_name = models.CharField(max_length=256)
 
 class Student(models.Model):
-    id = models.CharField(primary_key=True, max_length=10, editable=True)
+    id = models.CharField(primary_key=True, max_length=8, editable=True)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
     WAM = models.FloatField()
