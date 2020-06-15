@@ -14,9 +14,8 @@ class Unit(models.Model):
 
 class UnitCourse(models.Model):
     class Meta:
-        unique_together = (('unit', 'course'),)
+        unique_together = ('unit', 'course')
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
