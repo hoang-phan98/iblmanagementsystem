@@ -1,0 +1,50 @@
+image: python:3.8
+
+variables:
+  AWS_DEFAULT_REGION: "ap-southeast-2"
+  # variables set in gitlab's web gui:
+  #   AWS_ACCESS_KEY_ID
+  #   AWS_SECRET_ACCESS_KEY
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.pip-cache
+
+cache:
+  paths:
+    - $CI_PROJECT_DIR/.pip-cache
+
+stages:
+  - build
+  - test
+  - deploy
+
+".deploy-base":
+  stage: deploy
+  before_script:
+    - python -V
+    - python -m venv env
+    - source env/bin/activate
+    - pip install -r requirements.txt
+  script:
+    # creating aws credentials file
+    - mkdir -p ~/.aws
+    - echo "[default]" >> ~/.aws/credentials
+    - echo "aws_access_key_id = "$AWS_ACCESS_KEY_ID >> ~/.aws/credentials
+    - echo "aws_secret_access_key = "$AWS_SECRET_ACCESS_KEY >> ~/.aws/credentials
+    # try to update, if the command fails (probably not even deployed) do the initial deploy
+    - zappa update $ZAPPA_STAGE || zappa deploy $ZAPPA_STAGE
+  after_script:
+    # - cat ~/.aws/credentials
+    - rm ~/.aws/credentials
+
+deploy-dev:
+  extends: .deploy-base
+  variables:
+    ZAPPA_STAGE: dev
+  only:
+    - dev
+
+deploy-prod:
+  extends: .deploy-base
+  variables:
+    ZAPPA_STAGE: prod
+  only:
+    - master
