@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+# Detect whether running on Lambda
+IS_LAMBDA = bool(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
+ZAPPA_STAGE = os.environ.get('STAGE')
+ZAPPA_PROJECT = os.environ.get('PROJECT')
+
+if IS_LAMBDA and (not ZAPPA_STAGE or not ZAPPA_PROJECT):
+    raise RuntimeError("Zappa STAGE and PROJECT env variables must be defined when running in a Lambda")
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,7 +32,7 @@ SECRET_KEY = '=^#@o-cy6#x&rcg5##5s(gexy_@8-uw!%_8s%_@gln00qjtx$)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".execute-api.ap-southeast-2.amazonaws.com"]
 
 # Application definition
 
@@ -38,13 +46,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'IBLManagementSystemDRF',
     'core',
-    'corsheaders'
+    'corsheaders',
+    'django_s3_sqlite'
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,12 +86,26 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+# SQLite config, TODO: Postgres config
+# Override old sqlite3 on Lambda
+if IS_LAMBDA:
+    import sys
+    sys.modules['sqlite3'] = __import__('pysqlite3')
+    DATABASES = {
+        'default': {
+            "ENGINE": 'django_s3_sqlite',
+            "NAME": f'{ZAPPA_PROJECT}-{ZAPPA_STAGE}.db',
+            "BUCKET": 'fit3170-ibl-lambda-db',
+        }
     }
-}
+
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -116,8 +140,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-STATIC_URL = '/static/'
+STATIC_URL = f'/{ZAPPA_STAGE}/static/' if ZAPPA_STAGE else '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+WHITENOISE_STATIC_PREFIX = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # CORS
 CORS_ALLOW_CREDENTIALS = True
