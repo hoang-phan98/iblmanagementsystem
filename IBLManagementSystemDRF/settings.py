@@ -32,7 +32,7 @@ SECRET_KEY = '=^#@o-cy6#x&rcg5##5s(gexy_@8-uw!%_8s%_@gln00qjtx$)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".execute-api.ap-southeast-2.amazonaws.com"]
+ALLOWED_HOSTS = ["127.0.0.1", ".execute-api.ap-southeast-2.amazonaws.com"]
 
 # Application definition
 
@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'IBLManagementSystemDRF',
     'core',
     'corsheaders',
-    'django_s3_sqlite'
+    'django_s3_sqlite',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -145,6 +146,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 WHITENOISE_STATIC_PREFIX = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# CORS
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+# Swagger
+REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema' }
