@@ -46,10 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'IBLManagementSystemDRF',
     'core',
-    'swagger',
     'corsheaders',
     'django_s3_sqlite',
-    'rest_framework_swagger',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
