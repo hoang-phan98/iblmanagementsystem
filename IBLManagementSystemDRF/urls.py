@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls import url
 
 from core.api.urls import router as core_router
+from swagger.views import SwaggerSchemaView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/core/', include(core_router.urls)),
+    path('swagger/', SwaggerSchemaView.as_view()),
 ]
