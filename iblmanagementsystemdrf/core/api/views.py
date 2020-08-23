@@ -9,6 +9,7 @@ class StudentViewSet(viewsets.GenericViewSet,
 
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
+    lookup_field = email
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -29,6 +30,7 @@ class SupervisorViewSet(viewsets.GenericViewSet,
 
     queryset = Supervisor.objects.all()
     serializer_class = RetrieveSupervisorSerializer
+    lookup_field = email
 
     def get_paginated_response(self, data):
         return Response(data)
