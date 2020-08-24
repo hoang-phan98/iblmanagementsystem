@@ -65,10 +65,12 @@ class UnitViewSet(viewsets.GenericViewSet,
 
 class ApplicationViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin):
+                   mixins.RetrieveModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.UpdateModelMixin):
 
     queryset = Application.objects.all()
-    serializer_class = RetrieveUnitSerializer
+    serializer_class = RetrieveApplicationSerializer
 
     def get_paginated_response(self, data):
         return Response(data)
