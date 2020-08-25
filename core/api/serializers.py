@@ -40,7 +40,7 @@ class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ["status", "student", "unit"]
+        fields = ["status", "student", "unit", "date_started", "date_completed"]
 
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,7 +60,7 @@ class RetrieveActivitySerializer(serializers.ModelSerializer):
 class RetrieveQuestionnaireTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionnaireTemplate
-        fields = ["questions","active"]
+        fields = ["questions", "active"]
 
 class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
     class Meta:
