@@ -40,7 +40,7 @@ class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ["status", "student", "unit"]
+        fields = ["status", "student", "date_started", "date_completed"]
 
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,11 +57,15 @@ class RetrieveActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = ["id"]
 
+class RetrieveQuestionnaireTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionnaireTemplate
+        fields = ["questions", "active"]
+
 class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentResponse
         fields = ["id", "response"]
-
 
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
