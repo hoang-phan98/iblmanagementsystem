@@ -76,3 +76,8 @@ class Interview(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     staff = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+
+class StudentResponse(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    response = models.TextField()
+    
