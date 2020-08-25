@@ -84,4 +84,7 @@ class QuestionnaireTemplate(models.Model):
     questions = models.TextField() 
     active = models.BooleanField()
 
-    
+class StudentResponse(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    response = models.TextField()
+

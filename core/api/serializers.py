@@ -62,6 +62,11 @@ class RetrieveQuestionnaireTemplateSerializer(serializers.ModelSerializer):
         model = QuestionnaireTemplate
         fields = ["questions","active"]
 
+class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentResponse
+        fields = ["id", "response"]
+
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
 #         model = PrereqConjunction
