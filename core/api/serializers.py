@@ -57,6 +57,11 @@ class RetrieveActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = ["id"]
 
+class RetrieveQuestionnaireTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionnaireTemplate
+        fields = ["questions","active"]
+
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
 #         model = PrereqConjunction

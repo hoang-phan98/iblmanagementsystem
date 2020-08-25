@@ -115,6 +115,19 @@ class ActivityViewSet(viewsets.GenericViewSet,
     def get_paginated_response(self, data):
         return Response(data)
 
+class QuestionnaireTemplateViewSet(viewsets.GenericViewSet, 
+                            mixins.ListModelMixin, 
+                            mixins.DestroyModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.CreateModelMixin):
+    
+    queryset = QuestionnaireTemplate.objects.all()
+    serializer_class = RetrieveQuestionnaireTemplateSerializer
+    
+    def get_paginated_response(self,data):
+        return Response(data)
+
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
 #                    mixins.RetrieveModelMixin):
