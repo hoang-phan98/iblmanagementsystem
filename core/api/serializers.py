@@ -57,6 +57,12 @@ class RetrieveActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = ["id"]
 
+class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentResponse
+        fields = ["id", "response"]
+
+
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
 #         model = PrereqConjunction
