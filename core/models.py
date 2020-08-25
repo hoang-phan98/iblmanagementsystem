@@ -62,9 +62,9 @@ class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_started = models.DateTimeField(auto_now_add=True)
     date_completed = models.DateTimeField(default=None, blank=True, null=True)
+
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
