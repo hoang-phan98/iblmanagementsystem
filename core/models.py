@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class Course(models.Model):
     code = models.CharField(primary_key=True, max_length=5, editable=True)
@@ -64,6 +66,9 @@ class Application(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date_started = models.DateTimeField(auto_now_add=True)
     date_completed = models.DateTimeField(default=None, blank=True, null=True)
+    year_preference = models.PositiveIntegerField()
+    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), 
+                                                            MaxValueValidator(2)])
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
