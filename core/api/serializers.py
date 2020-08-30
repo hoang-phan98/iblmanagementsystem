@@ -40,7 +40,7 @@ class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ["status", "student", "date_started", "date_completed"]
+        fields = ["status", "student", "date_started", "date_completed", "year_preference","semester_preference"]
 
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
