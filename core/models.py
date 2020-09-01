@@ -27,7 +27,6 @@ class Supervisor(models.Model):
     family_name = models.CharField(max_length=256)
     email = models.CharField(max_length=256)
 
-
 class Student(models.Model):
     id = models.CharField(primary_key=True, max_length=8, editable=True)
     given_name = models.CharField(max_length=256)
@@ -37,7 +36,6 @@ class Student(models.Model):
     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     email = models.CharField(max_length=256)
-
 
 class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

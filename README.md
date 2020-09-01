@@ -95,7 +95,6 @@ class Student(models.Model):
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
     email = models.CharField(max_length=256)
-
 ```
 
 - A full list of fields can be found at:
@@ -151,7 +150,6 @@ class StudentViewSet(viewsets.GenericViewSet,
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
     lookup_field = email
-
 
     def get_paginated_response(self, data):
         return Response(data)
