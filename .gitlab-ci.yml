@@ -33,6 +33,7 @@ stages:
     - echo "aws_secret_access_key = "$AWS_SECRET_ACCESS_KEY >> ~/.aws/credentials
     # try to update, if the command fails (probably not even deployed) do the initial deploy
     - zappa update $ZAPPA_STAGE || zappa deploy $ZAPPA_STAGE
+    - zappa manage $ZAPPA_STAGE create_admin_user || echo "Admin user already exists"
     - zappa manage $ZAPPA_STAGE migrate
   after_script:
     # - cat ~/.aws/credentials
