@@ -36,6 +36,7 @@ class Student(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     email = models.CharField(max_length=256)
 
+
 class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_name = models.CharField(max_length=256)
