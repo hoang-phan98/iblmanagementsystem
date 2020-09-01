@@ -10,7 +10,7 @@ class StudentViewSet(viewsets.GenericViewSet,
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
     lookup_field = 'email'
-    lookup_value_regex = '[^/]+'
+    lookup_value_regex = r'[^/]+'
 
     def get_paginated_response(self, data):
         return Response(data)
