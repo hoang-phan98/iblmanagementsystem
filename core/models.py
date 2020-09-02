@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class Course(models.Model):
     code = models.CharField(primary_key=True, max_length=5, editable=True)
@@ -62,7 +64,11 @@ class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    date_started = models.DateTimeField(auto_now_add=True)
+    date_completed = models.DateTimeField(default=None, blank=True, null=True)
+    year_preference = models.PositiveIntegerField()
+    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), 
+                                                            MaxValueValidator(2)])
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -76,3 +82,15 @@ class Interview(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     staff = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+
+class QuestionnaireTemplate(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #Currently just a TetField to store the JSON. JSONField can be used in Postgres.
+    #Otherwise could also use https://github.com/rpkilby/jsonfield
+    questions = models.TextField() 
+    active = models.BooleanField()
+
+class StudentResponse(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    response = models.TextField()
+

@@ -18,7 +18,8 @@ ZAPPA_STAGE = os.environ.get('STAGE')
 ZAPPA_PROJECT = os.environ.get('PROJECT')
 
 if IS_LAMBDA and (not ZAPPA_STAGE or not ZAPPA_PROJECT):
-    raise RuntimeError("Zappa STAGE and PROJECT env variables must be defined when running in a Lambda")
+    raise RuntimeError(
+        "Zappa STAGE and PROJECT env variables must be defined when running in a Lambda")
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +33,8 @@ SECRET_KEY = '=^#@o-cy6#x&rcg5##5s(gexy_@8-uw!%_8s%_@gln00qjtx$)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", ".execute-api.ap-southeast-2.amazonaws.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1",
+                 ".execute-api.ap-southeast-2.amazonaws.com"]
 
 # Application definition
 
@@ -47,7 +49,6 @@ INSTALLED_APPS = [
     'IBLManagementSystemDRF',
     'core',
     'corsheaders',
-    'django_s3_sqlite',
     'drf_yasg',
 ]
 
@@ -87,16 +88,26 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# SQLite config, TODO: Postgres config
-# Override old sqlite3 on Lambda
-if IS_LAMBDA:
-    import sys
-    sys.modules['sqlite3'] = __import__('pysqlite3')
+# Default: SQLite locally, Postgres remotely
+# Set this locally if you want to connect to Postgres
+USE_REMOTE_DB = os.environ.get("USE_REMOTE_DB")
+if IS_LAMBDA or USE_REMOTE_DB:
+    USER = os.environ.get("DB_USER")
+    PASSWORD = os.environ.get("DB_PASSWORD")
+    DB_NAME = os.environ.get("DB_NAME")
+    HOST = 'db-dev.ctapjxkszyvy.ap-southeast-2.rds.amazonaws.com'
+    PORT = '5432'
+
+    print(
+        f"Connecting to postgresql://{HOST}:{PORT}/{DB_NAME}?user={USER}")
     DATABASES = {
         'default': {
-            "ENGINE": 'django_s3_sqlite',
-            "NAME": f'{ZAPPA_PROJECT}-{ZAPPA_STAGE}.db',
-            "BUCKET": 'fit3170-ibl-lambda-db',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': DB_NAME,
+            'USER': USER,
+            'PASSWORD': PASSWORD,
+            'HOST': HOST,
+            'PORT': PORT,
         }
     }
 
@@ -147,4 +158,18 @@ WHITENOISE_STATIC_PREFIX = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Swagger
-REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema' }
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+}
+
+# CORS configurations for deployed websites
+CORS_ORIGIN_WHITELIST = [
+    "https://d3jlac0jbsd1oq.cloudfront.net",
+    "http://fit3170-ibl-2020-dev.s3-website-ap-southeast-2.amazonaws.com"
+]
+
+# Allow localhost CORS requests
+CORS_ORIGIN_REGEX_WHITELIST = [
+    r"http://localhost:\d+$",
+    r"http://127\.0\.0\.1:\d+$"
+]
