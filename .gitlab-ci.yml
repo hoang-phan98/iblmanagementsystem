@@ -21,7 +21,7 @@ stages:
   before_script:
     # Write env variables to the .env file
     - echo "Gitlab CI environment = "$CI_ENVIRONMENT_NAME
-    - echo "DATABASE_URL = "$DATABASE_URL >> .env
+    - echo "DATABASE_URL="$DATABASE_URL >> .env
     # Create virtual environment and install packages
     - python -V
     - python -m venv env
