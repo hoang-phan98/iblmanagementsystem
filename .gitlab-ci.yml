@@ -22,7 +22,6 @@ stages:
     - python -V
     - python -m venv env
     - source env/bin/activate
-    - echo "pysqlite3-binary==0.4.3" >> requirements.txt # Need this only for Lambda runtime
     - pip install -r requirements.txt
     - python manage.py makemigrations
   script:

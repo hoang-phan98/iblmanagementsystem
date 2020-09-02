@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'IBLManagementSystemDRF',
     'core',
     'corsheaders',
-    'django_s3_sqlite',
     'drf_yasg',
 ]
 
@@ -89,16 +88,26 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# SQLite config, TODO: Postgres config
-# Override old sqlite3 on Lambda
-if IS_LAMBDA:
-    import sys
-    sys.modules['sqlite3'] = __import__('pysqlite3')
+# Default: SQLite locally, Postgres remotely
+# Set this locally if you want to connect to Postgres
+USE_REMOTE_DB = os.environ.get("USE_REMOTE_DB")
+if IS_LAMBDA or USE_REMOTE_DB:
+    USER = os.environ.get("DB_USER")
+    PASSWORD = os.environ.get("DB_PASSWORD")
+    DB_NAME = os.environ.get("DB_NAME")
+    HOST = 'db-dev.ctapjxkszyvy.ap-southeast-2.rds.amazonaws.com'
+    PORT = '5432'
+
+    print(
+        f"Connecting to postgresql://{HOST}:{PORT}/{DB_NAME}?user={USER}")
     DATABASES = {
         'default': {
-            "ENGINE": 'django_s3_sqlite',
-            "NAME": f'{ZAPPA_PROJECT}-{ZAPPA_STAGE}.db',
-            "BUCKET": 'fit3170-ibl-lambda-db',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': DB_NAME,
+            'USER': USER,
+            'PASSWORD': PASSWORD,
+            'HOST': HOST,
+            'PORT': PORT,
         }
     }
 
