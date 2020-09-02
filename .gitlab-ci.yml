@@ -43,7 +43,6 @@ deploy-dev:
   extends: .deploy-base
   environment:
     name: dev
-    url: https://zosgl22m86.execute-api.ap-southeast-2.amazonaws.com/dev
   variables:
     ZAPPA_STAGE: dev
   only:
@@ -53,7 +52,6 @@ deploy-prod:
   extends: .deploy-base
   environment:
     name: prod
-    url: https://hcuicavzrg.execute-api.ap-southeast-2.amazonaws.com/prod
   variables:
     ZAPPA_STAGE: prod
   only:
