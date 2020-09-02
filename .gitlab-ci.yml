@@ -19,10 +19,14 @@ stages:
 ".deploy-base":
   stage: deploy
   before_script:
+    # Write env variables to the .env file
+    - echo "DATABASE_URL = "$DATABASE_URL >> .env
+    # Create virtual environment and install packages
     - python -V
     - python -m venv env
     - source env/bin/activate
     - pip install -r requirements.txt
+    # Make Django migrations before deploying package to Lambda
     - python manage.py makemigrations
   script:
     # creating aws credentials file

@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import environ
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+env = environ.Env(
+    # Set this locally if you want to connect to Postgres
+    USE_REMOTE_DB=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Detect whether running on Lambda
 IS_LAMBDA = bool(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
@@ -21,8 +31,6 @@ if IS_LAMBDA and (not ZAPPA_STAGE or not ZAPPA_PROJECT):
     raise RuntimeError(
         "Zappa STAGE and PROJECT env variables must be defined when running in a Lambda")
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -89,34 +97,15 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 # Default: SQLite locally, Postgres remotely
-# Set this locally if you want to connect to Postgres
-USE_REMOTE_DB = os.environ.get("USE_REMOTE_DB")
+USE_REMOTE_DB = env('USE_REMOTE_DB')
 if IS_LAMBDA or USE_REMOTE_DB:
-    USER = os.environ.get("DB_USER")
-    PASSWORD = os.environ.get("DB_PASSWORD")
-    DB_NAME = os.environ.get("DB_NAME")
-    HOST = 'db-dev.ctapjxkszyvy.ap-southeast-2.rds.amazonaws.com'
-    PORT = '5432'
-
-    print(
-        f"Connecting to postgresql://{HOST}:{PORT}/{DB_NAME}?user={USER}")
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': DB_NAME,
-            'USER': USER,
-            'PASSWORD': PASSWORD,
-            'HOST': HOST,
-            'PORT': PORT,
-        }
+        'default': env.db()
     }
 
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+        'default': env.db('SQLITE_URL', default="sqlite:///db.sqlite3")
     }
 
 # Password validation
