@@ -3,5 +3,5 @@ from django.urls import path
 
 
 url_patterns = [
-	path('wam', wam)
+    path('wam', wam)
 ]
