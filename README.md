@@ -86,7 +86,7 @@ class SuperVisor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
-    email = models.CharField(max_length=256)
+    email = models.EmailField(max_length=256)
 
 class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -94,7 +94,7 @@ class Student(models.Model):
     supervisor = models.ForeinKey(SuperVisor, on_delete=models.CASCADE)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
-    email = models.CharField(max_length=256)
+    email = models.EmailField(max_length=256)
 ```
 
 - A full list of fields can be found at:
@@ -149,7 +149,6 @@ class StudentViewSet(viewsets.GenericViewSet,
 
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
-    lookup_field = email
 
     def get_paginated_response(self, data):
         return Response(data)
