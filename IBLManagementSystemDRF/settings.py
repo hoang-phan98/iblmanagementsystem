@@ -108,6 +108,16 @@ else:
         }
     }
 
+
+#s3 bucket
+if IS_LAMBDA:
+    # Amazon Web Services
+    AWS_DEFAULT_ACL = None
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_STORAGE_BUCKET_NAME = 'fit3170-ibl-2020-storage'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
