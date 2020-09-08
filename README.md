@@ -152,7 +152,6 @@ class StudentViewSet(viewsets.GenericViewSet,
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
 
-
     def get_paginated_response(self, data):
         return Response(data)
 ```
