@@ -1,7 +1,6 @@
-from eligibility.api.views import wam
-from django.urls import path
+from eligibility.api import views as eligibility_views
+from rest_framework import routers
 
+router = routers.DefaultRouter()
 
-url_patterns = [
-    path('wam', wam)
-]
+router.register('wam', eligibility_views.WamCheck, basename='Wam')
