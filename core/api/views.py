@@ -148,8 +148,10 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
 
     def update(self, request, *args, **kwargs):
         response_query = request.POST.get("questions")
-        if response_query is None or not self.validateTemplateJson(response_query):
-            return Response({})
+
+        validateJson = self.validateTemplateJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
 
         return super().update(request, *args, **kwargs)
 
@@ -157,8 +159,9 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
         response_query = request.POST.get("questions") #Query_params didn't work, but POST.get did?
        # response_query = request.query_params.get("response",None)
         
-        if response_query is None or not self.validateTemplateJson(response_query):
-            return Response({})
+        validateJson = self.validateTemplateJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
         
@@ -181,23 +184,23 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
             
             #Checking that there aren't any fields other than the response and the only key is response
             if len(json_data) > 1:
-                return False
+                return "There are too many keys in the JSON object. Only 'questions' should be present."
             
             #If accessing response doesn't work then there's a key error and this will return false
             response_array = json_data['questions']
 
             #Checking that all the fields are the specified format.
             if len(response_array) == 0:
-                return False 
+                return "questions is empty." 
 
-            for i in range(0,len(response_array)):
+            for i in range(len(response_array)):
                 keys = list(response_array[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'format' or len(keys) != 2:
-                    return False
+                    return "Invalid key in response array."
             
-            return True
+            return ""
         except:
-            return False
+            return "Invalid JSON object or no 'questions' key present in object."
     
     def get_paginated_response(self,data):
         return Response(data)
@@ -213,17 +216,18 @@ class StudentResponse(viewsets.GenericViewSet,
 
     def update(self, request, *args, **kwargs):
         response_query = request.POST.get("response")
-        if response_query is None or not self.validateResponseJson(response_query):
-            return Response({})
+        validateJson = self.validateResponseJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
 
         return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         response_query = request.POST.get("response") #Query_params didn't work, but POST.get did?
        # response_query = request.query_params.get("response",None)
-        
-        if response_query is None or not self.validateResponseJson(response_query):
-            return Response({})
+        validateJson = self.validateResponseJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
         
@@ -242,23 +246,23 @@ class StudentResponse(viewsets.GenericViewSet,
             
             #Checking that there aren't any fields other than the response and the only key is response
             if len(json_data) > 1:
-                return False
+                return "There are too many keys in the JSON object. Only 'response' should be present."
             
             #If accessing response doesn't work then there's a key error and this will return false
             response_array = json_data['response']
 
             #Checking that all the fields are the specified format.
             if len(response_array) == 0:
-                return False 
+                return "Response is empty."
 
-            for i in range(0,len(response_array)):
+            for i in range(len(response_array)):
                 keys = list(response_array[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'answer' or len(keys) != 2:
-                    return False
+                    return "Invalid key in response array."
             
-            return True
+            return ""
         except:
-            return False
+            return "Invalid JSON object or no 'response' key present in object."
         
         
     def get_paginated_response(self, data):
