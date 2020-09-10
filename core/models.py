@@ -1,14 +1,15 @@
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from .api.validators import *
 
 
 class Course(models.Model):
-    code = models.CharField(primary_key=True, max_length=5, editable=True)
+    code = models.CharField(primary_key=True, max_length=5, editable=True, validators=[validate_course_code])
     course_name = models.CharField(max_length=255)
 
 class Unit(models.Model):
-    code = models.CharField(primary_key=True, max_length=7, editable=True)
+    code = models.CharField(primary_key=True, max_length=7, editable=True, validators=[validate_unit_code])
     name = models.CharField(max_length=256)
     year = models.PositiveIntegerField()
     semester = models.PositiveIntegerField()
@@ -28,14 +29,14 @@ class Supervisor(models.Model):
     email = models.EmailField(max_length=256)
 
 class Student(models.Model):
-    id = models.CharField(primary_key=True, max_length=8, editable=True)
+    id = models.CharField(primary_key=True, max_length=8, editable=True, validators=[validate_student_id])
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
     WAM = models.FloatField()
     credit_points = models.PositiveIntegerField()
     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    email = models.EmailField(max_length=256)
+    email = models.EmailField(max_length=256, validators=[validate_school_email])
 
 class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -66,11 +67,10 @@ class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_started = models.DateTimeField(auto_now_add=True)
-    date_completed = models.DateTimeField(default=None, blank=True, null=True)
+    date_started = models.DateField(auto_now_add=True)
+    date_completed = models.DateField(default=None, blank=True, null=True)
     year_preference = models.PositiveIntegerField()
-    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), 
-                                                            MaxValueValidator(2)])
+    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(2)])
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
