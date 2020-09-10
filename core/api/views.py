@@ -1,10 +1,9 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from .serializers import *
+from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
-
-
 
 
 class StudentViewSet(viewsets.GenericViewSet,
@@ -267,6 +266,33 @@ class StudentResponse(viewsets.GenericViewSet,
         
     def get_paginated_response(self, data):
         return Response(data)
+
+class UserResponse(viewsets.GenericViewSet):
+    """
+    Checks for a Student or Supervisor based on input email, if exists (send 500 if not exist). Will also return their
+    data. Return dict with two keys. 'type' is either 'student' or 'supervisor', and 'info' is the Student/Supervisor
+    QuerySet as an object. If the Student or Supervisor is not found, a 500 Response is sent.
+    """
+
+    lookup_value_regex = '[^/]+'
+
+    def retrieve(self, request, pk=None):
+        if pk is None:
+            return HttpResponseServerError()
+        obj = Student.objects.filter(email__exact=str(pk)).first()
+        is_student = obj is not None
+        obj = obj if obj else Supervisor.objects.filter(email__exact=str(pk)).first()
+        if not obj:
+            return HttpResponseServerError()
+        if is_student:
+            s = RetrieveStudentSerializer(obj)
+        else:
+            s = RetrieveSupervisorSerializer(obj)
+        res = {
+            'type': 'student' if is_student else 'supervisor',
+            'info': s.data
+        }
+        return HttpResponse(json.dumps(res), content_type='application/json')
 
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
