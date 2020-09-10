@@ -66,3 +66,12 @@ def validate_credit_points(credit_points):
     if credit_points%6 != 0:
         raise ValidationError("Credit points must be a multiple of 6")
     return credit_points
+
+
+def validate_year(year):
+    """
+    Validate a given year field - must have fixed length of 4
+    """
+    if len(str(year)) != 4:
+        raise ValidationError("Please enter a valid year")
+    return year

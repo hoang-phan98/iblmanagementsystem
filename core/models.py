@@ -11,7 +11,7 @@ class Course(models.Model):
 class Unit(models.Model):
     code = models.CharField(primary_key=True, max_length=7, editable=True, validators=[validate_unit_code])
     name = models.CharField(max_length=256)
-    year = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(validators=[validate_year])
     semester = models.PositiveIntegerField()
     is_ibl_unit = models.BooleanField()
 
@@ -45,7 +45,7 @@ class Company(models.Model):
 class Placement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     semester = models.PositiveIntegerField()
-    year = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(validators=[validate_year])
     role = models.CharField(max_length=256)
     department = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -70,7 +70,7 @@ class Application(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date_started = models.DateField(auto_now_add=True)
     date_completed = models.DateField(default=None, blank=True, null=True)
-    year_preference = models.PositiveIntegerField()
+    year_preference = models.PositiveIntegerField(validators=[validate_year])
     semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(2)])
 
 class Activity(models.Model):
