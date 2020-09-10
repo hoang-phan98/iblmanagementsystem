@@ -71,7 +71,7 @@ class Application(models.Model):
     date_started = models.DateField(auto_now_add=True)
     date_completed = models.DateField(default=None, blank=True, null=True)
     year_preference = models.PositiveIntegerField(validators=[validate_year])
-    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(2)])
+    semester_preference = models.CharField(max_length=1, choices=[("1", "1"), ("2", "2")])
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
