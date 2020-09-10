@@ -48,3 +48,5 @@ def validate_school_email(email):
         raise ValidationError("Please enter a valid Monash email address")
     else:
         return email
+
+

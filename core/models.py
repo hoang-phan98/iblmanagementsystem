@@ -65,7 +65,8 @@ class EligibilityRules(models.Model):
 
 class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    status = models.CharField(max_length=256)
+    status = models.CharField(max_length=1, default=("I", "Incomplete"), choices=[("I", "Incomplete"),
+                                                                                  ("C", "Completed")])
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date_started = models.DateField(auto_now_add=True)
     date_completed = models.DateField(default=None, blank=True, null=True)
@@ -79,7 +80,7 @@ class Interview(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     time = models.DateTimeField()
     location = models.CharField(max_length=256)
-    outcome_details = models.CharField(max_length=256)
+    outcome_details = models.CharField(max_length=1, blank=True, choices=[("S", "Successful"), ("U", "Unsuccessful")])
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
