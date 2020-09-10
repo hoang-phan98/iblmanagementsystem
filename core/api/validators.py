@@ -50,3 +50,19 @@ def validate_school_email(email):
         return email
 
 
+def validate_student_wam(wam):
+    """
+    Validate the given student WAM - between 0-100, 2 decimal places
+    """
+    if wam < 0 or wam > 100:
+        raise ValidationError("Please enter a value between 0 and 100")
+    return round(wam, 2)
+
+
+def validate_credit_points(credit_points):
+    """
+    Validate the given credit points - must be a multiple of 6
+    """
+    if credit_points%6 != 0:
+        raise ValidationError("Credit points must be a multiple of 6")
+    return credit_points
