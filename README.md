@@ -218,3 +218,21 @@ Run the django server
 ```
 $ python manage.py runserver
 ```
+
+## Set Up Postgres Local Database
+Install pgAdmin software
+```
+https://www.pgadmin.org/
+```
+
+Create a user with the following credentials:
+```
+name: admin
+password: admin
+```
+
+Create a database with the following credentials:
+```
+name: ibl-dev
+owner: admin
+```
