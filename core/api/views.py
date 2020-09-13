@@ -294,6 +294,16 @@ class UserResponse(viewsets.GenericViewSet):
         }
         return HttpResponse(json.dumps(res), content_type='application/json')
 
+class StudentandUnitViewset(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = StudentandUnit.objects.all()
+    serializer_class = RetrieveStudentandUnitSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+        
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
 #                    mixins.RetrieveModelMixin):
