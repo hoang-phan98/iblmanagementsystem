@@ -1,16 +1,17 @@
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from .api.validators import *
 
 
 class Course(models.Model):
-    code = models.CharField(primary_key=True, max_length=5, editable=True)
+    code = models.CharField(primary_key=True, max_length=5, editable=True, validators=[validate_course_code])
     course_name = models.CharField(max_length=255)
 
 class Unit(models.Model):
-    code = models.CharField(primary_key=True, max_length=7, editable=True)
+    code = models.CharField(primary_key=True, max_length=7, editable=True, validators=[validate_unit_code])
     name = models.CharField(max_length=256)
-    year = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(validators=[validate_year])
     semester = models.PositiveIntegerField()
     is_ibl_unit = models.BooleanField()
 
@@ -28,14 +29,14 @@ class Supervisor(models.Model):
     email = models.EmailField(max_length=256)
 
 class Student(models.Model):
-    id = models.CharField(primary_key=True, max_length=8, editable=True)
+    id = models.CharField(primary_key=True, max_length=8, editable=True, validators=[validate_student_id])
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
-    WAM = models.FloatField()
-    credit_points = models.PositiveIntegerField()
+    WAM = models.DecimalField(max_digits=5, decimal_places=2, validators=[validate_student_wam])
+    credit_points = models.PositiveIntegerField(validators=[validate_credit_points])
     supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    email = models.EmailField(max_length=256)
+    email = models.EmailField(max_length=256, validators=[validate_school_email])
 
 class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -44,7 +45,7 @@ class Company(models.Model):
 class Placement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     semester = models.PositiveIntegerField()
-    year = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(validators=[validate_year])
     role = models.CharField(max_length=256)
     department = models.CharField(max_length=256)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -64,13 +65,13 @@ class EligibilityRules(models.Model):
 
 class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    status = models.CharField(max_length=256)
+    status = models.CharField(max_length=1, default=("I", "Incomplete"), choices=[("I", "Incomplete"),
+                                                                                  ("C", "Completed")])
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_started = models.DateTimeField(auto_now_add=True)
-    date_completed = models.DateTimeField(default=None, blank=True, null=True)
-    year_preference = models.PositiveIntegerField()
-    semester_preference = models.PositiveIntegerField(validators=[MinValueValidator(1), 
-                                                            MaxValueValidator(2)])
+    date_started = models.DateField(auto_now_add=True)
+    date_completed = models.DateField(default=None, blank=True, null=True)
+    year_preference = models.PositiveIntegerField(validators=[validate_year])
+    semester_preference = models.CharField(max_length=1, choices=[("1", "1"), ("2", "2")])
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -79,7 +80,7 @@ class Interview(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     time = models.DateTimeField()
     location = models.CharField(max_length=256)
-    outcome_details = models.CharField(max_length=256)
+    outcome_details = models.CharField(max_length=1, blank=True, choices=[("S", "Successful"), ("U", "Unsuccessful")])
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
