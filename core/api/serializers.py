@@ -67,6 +67,11 @@ class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
         model = StudentResponse
         fields = ["id", "response"]
 
+class RetrieveStudentUnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentUnit
+        fields = ["id", "student_id", "unit_id", "year", "semester", "Pass"]
+
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
 #         model = PrereqConjunction

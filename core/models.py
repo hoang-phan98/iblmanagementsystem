@@ -97,3 +97,12 @@ class StudentResponse(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     response = models.TextField()
 
+class StudentUnit(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+    unit_id = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    year = models.PositiveIntegerField(validators=[validate_year])
+    semester = models.PositiveIntegerField()
+    Pass = models.BooleanField()
+    
