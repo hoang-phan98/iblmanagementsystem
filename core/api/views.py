@@ -1,10 +1,14 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
 from .serializers import *
 from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
 
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
