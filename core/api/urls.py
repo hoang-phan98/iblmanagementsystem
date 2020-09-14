@@ -16,5 +16,6 @@ router.register('eligibility_rules', core_views.EligibilityRulesViewSet, basenam
 router.register('activity', core_views.ActivityViewSet, basename='Activity')
 router.register('questionnaire_template', core_views.QuestionnaireTemplateViewSet, basename='Questionnaire Template')
 router.register('student_response', core_views.StudentResponse, basename='Student Response')
+router.register('user', core_views.UserResponse, basename='User Response')
 
 # router.register('prereq_conjunction', core_views.PrereqConjunctionViewSet, basename='Prerequisite Conjunction')

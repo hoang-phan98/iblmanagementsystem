@@ -4,7 +4,7 @@ from rest_framework import serializers
 class RetrieveStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["id", "given_name", "family_name", "course", "supervisor", "WAM", "credit_points",
+        fields = ["id", "given_name", "family_name", "course", "supervisor", "WAM", "credit_points", "email",
                   "interview_set", "placement_set", "application_set"]
 
 class RetrieveCourseSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class RetrieveCourseSerializer(serializers.ModelSerializer):
 class RetrieveSupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supervisor
-        fields = ["id", "given_name", "family_name", "student_set", "interview_set"]
+        fields = ["id", "given_name", "family_name", "student_set", "interview_set", "email"]
 
 class RetrievePlacementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,6 +66,11 @@ class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentResponse
         fields = ["id", "response"]
+
+class RetrieveStudentandUnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentandUnit
+        fields = ["id", "student", "unit", "year", "semester", "Pass"]
 
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:

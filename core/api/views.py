@@ -1,7 +1,10 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from .serializers import *
+from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
+import json
+
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -142,7 +145,62 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
         serializer = RetrieveQuestionnaireTemplateSerializer(instances, many=True)
         return Response(serializer.data)
 
+    def update(self, request, *args, **kwargs):
+        response_query = request.POST.get("questions")
 
+        validateJson = self.validateTemplateJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
+
+        return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        response_query = request.POST.get("questions") #Query_params didn't work, but POST.get did?
+       # response_query = request.query_params.get("response",None)
+        
+        validateJson = self.validateTemplateJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
+
+        return super().create(request, *args, **kwargs)
+        
+           
+    """
+        The validateTemplateJson function for the student response class ensures that a string given can be converted to
+        JSON. Valid JSON formats conform to following:
+            questions: [{"question": "question here", "format": "A format to display the question on the frontend"}]
+            To further elaborate format, this field can be used to specify how the question should be presented. 
+            For example if the question was a radio button selection the format may be: radio buttons
+
+        Parameters:
+            json_object - a string to validate
+        Returns:
+            A boolean of if the string meets the above requirements.
+    """
+    def validateTemplateJson(self, json_object):
+        try:
+            json_data = json.loads(json_object) #This won't be needed if we use JSONField
+            
+            #Checking that there aren't any fields other than the response and the only key is response
+            if len(json_data) > 1:
+                return "There are too many keys in the JSON object. Only 'questions' should be present."
+            
+            #If accessing response doesn't work then there's a key error and this will return false
+            response_array = json_data['questions']
+
+            #Checking that all the fields are the specified format.
+            if len(response_array) == 0:
+                return "questions is empty." 
+
+            for i in range(len(response_array)):
+                keys = list(response_array[i].keys())
+                if keys[0].lower() != 'question' or keys[1].lower() != 'format' or len(keys) != 2:
+                    return "Invalid key in response array."
+            
+            return ""
+        except:
+            return "Invalid JSON object or no 'questions' key present in object."
+    
     def get_paginated_response(self,data):
         return Response(data)
 
@@ -155,9 +213,97 @@ class StudentResponse(viewsets.GenericViewSet,
     queryset = StudentResponse.objects.all()
     serializer_class = RetrieveStudentResponseSerializer
 
+    def update(self, request, *args, **kwargs):
+        response_query = request.POST.get("response")
+        validateJson = self.validateResponseJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
+
+        return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        response_query = request.POST.get("response") #Query_params didn't work, but POST.get did?
+       # response_query = request.query_params.get("response",None)
+        validateJson = self.validateResponseJson(response_query)
+        if response_query is None or validateJson != "":
+            return Response(validateJson)
+
+        return super().create(request, *args, **kwargs)
+        
+           
+    """
+        The validateResponseJson function for the student response class ensures that a string given can be converted to
+        JSON and it contains only the specified keys of 'question' and 'answer'
+        Parameters:
+            json_object - a string to validate
+        Returns:
+            A boolean of if the string meets the above requirements.
+    """
+    def validateResponseJson(self, json_object):
+        try:
+            json_data = json.loads(json_object) #This won't be needed if we use JSONField
+            
+            #Checking that there aren't any fields other than the response and the only key is response
+            if len(json_data) > 1:
+                return "There are too many keys in the JSON object. Only 'response' should be present."
+            
+            #If accessing response doesn't work then there's a key error and this will return false
+            response_array = json_data['response']
+
+            #Checking that all the fields are the specified format.
+            if len(response_array) == 0:
+                return "Response is empty."
+
+            for i in range(len(response_array)):
+                keys = list(response_array[i].keys())
+                if keys[0].lower() != 'question' or keys[1].lower() != 'answer' or len(keys) != 2:
+                    return "Invalid key in response array."
+            
+            return ""
+        except:
+            return "Invalid JSON object or no 'response' key present in object."
+        
+        
     def get_paginated_response(self, data):
         return Response(data)
 
+class UserResponse(viewsets.GenericViewSet):
+    """
+    Checks for a Student or Supervisor based on input email, if exists (send 500 if not exist). Will also return their
+    data. Return dict with two keys. 'type' is either 'student' or 'supervisor', and 'info' is the Student/Supervisor
+    QuerySet as an object. If the Student or Supervisor is not found, a 500 Response is sent.
+    """
+
+    lookup_value_regex = '[^/]+'
+
+    def retrieve(self, request, pk=None):
+        if pk is None:
+            return HttpResponseServerError()
+        obj = Student.objects.filter(email__exact=str(pk)).first()
+        is_student = obj is not None
+        obj = obj if obj else Supervisor.objects.filter(email__exact=str(pk)).first()
+        if not obj:
+            return HttpResponseServerError()
+        if is_student:
+            s = RetrieveStudentSerializer(obj)
+        else:
+            s = RetrieveSupervisorSerializer(obj)
+        res = {
+            'type': 'student' if is_student else 'supervisor',
+            'info': s.data
+        }
+        return HttpResponse(json.dumps(res), content_type='application/json')
+
+class StudentandUnitViewset(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin):
+
+    queryset = StudentandUnit.objects.all()
+    serializer_class = RetrieveStudentandUnitSerializer
+
+    def get_paginated_response(self, data):
+        return Response(data)
+        
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
 #                    mixins.RetrieveModelMixin):

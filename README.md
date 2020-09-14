@@ -86,6 +86,7 @@ class SuperVisor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
+    email = models.EmailField(max_length=256)
 
 class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -93,6 +94,7 @@ class Student(models.Model):
     supervisor = models.ForeinKey(SuperVisor, on_delete=models.CASCADE)
     given_name = models.CharField(max_length=256)
     family_name = models.CharField(max_length=256)
+    email = models.EmailField(max_length=256)
 ```
 
 - A full list of fields can be found at:
@@ -113,7 +115,7 @@ from rest_framework import serializers
 class RetrieveStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["given_name", "family_name", "course", "supervisor"]
+        fields = ["given_name", "family_name", "course", "supervisor", "email"]
 
 class RetrieveCourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -124,7 +126,7 @@ class RetrieveCourseSerializer(serializers.ModelSerializer):
 class RetrieveSupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supervisor
-        fields = ["given_name", "family_name", "student_set"]
+        fields = ["given_name", "family_name", "student_set", "email"]
 
 ```
 
@@ -215,4 +217,22 @@ $ python manage.py migrate
 Run the django server
 ```
 $ python manage.py runserver
+```
+
+## Set Up Postgres Local Database
+Install pgAdmin software
+```
+https://www.pgadmin.org/
+```
+
+Create a user with the following credentials:
+```
+name: admin
+password: admin
+```
+
+Create a database with the following credentials:
+```
+name: ibl-dev
+owner: admin
 ```
