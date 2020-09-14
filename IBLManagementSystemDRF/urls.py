@@ -40,7 +40,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('google_login/', GoogleLogin.as_view(), name="Google-login"),
+    path('api/google_login/', GoogleLogin.as_view(), name="Google-login"),
     path('api/core/', include(core_router.urls)),
     path('api/eligibility/', include(eligibility_router.urls)),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
