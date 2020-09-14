@@ -6,16 +6,56 @@ from .serializers import *
 from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from .permissions import GroupBasePermission, HasGroupPermission
 
-class GoogleLogin(SocialLoginView):
+from rest_auth.views import LoginView
+from rest_auth.registration.serializers import SocialLoginSerializer
+from allauth.account.adapter import get_adapter
+from django.contrib.auth.models import Group
+
+
+
+class IBLLoginView(LoginView):
+    
+   def login(self):
+        self.user = self.serializer.validated_data['user']
+        email = self.user.__dict__['email']
+
+        
+        my_group = Group.objects.get(name='student') 
+        my_group.user_set.add(self.user)
+        print("\n\n",self.user.__dict__,"\n\n")
+        super().login()
+    
+    
+class IBLSocialLoginView(IBLLoginView):
+    serializer_class = SocialLoginSerializer
+
+    def process_login(self):
+        get_adapter(self.request).login(self.request, self.user)
+
+
+class GoogleLogin(IBLSocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+
+
+
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    
+    permission_classes = [HasGroupPermission]
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
+    required_groups = {
+         'GET': ['student'],
+         'POST': ['student'],
+         'PUT': ['student'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -24,6 +64,8 @@ class CourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Course.objects.all()
     serializer_class = RetrieveCourseSerializer
 
@@ -34,6 +76,8 @@ class SupervisorViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Supervisor.objects.all()
     serializer_class = RetrieveSupervisorSerializer
 
@@ -44,6 +88,8 @@ class CompanyViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
     serializer_class = RetrieveCompanySerializer
 
@@ -54,6 +100,8 @@ class PlacementViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Placement.objects.all()
     serializer_class = RetrievePlacementSerializer
 
@@ -64,6 +112,8 @@ class UnitViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Unit.objects.all()
     serializer_class = RetrieveUnitSerializer
 
@@ -76,6 +126,8 @@ class ApplicationViewSet(viewsets.GenericViewSet,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Application.objects.all()
     serializer_class = RetrieveApplicationSerializer
 
@@ -86,6 +138,8 @@ class InterviewViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Interview.objects.all()
     serializer_class = RetrieveInterviewSerializer
 
@@ -96,6 +150,8 @@ class UnitCourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = UnitCourse.objects.all()
     serializer_class = RetrieveUnitCourseSerializer
 
@@ -106,6 +162,8 @@ class EligibilityRulesViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = EligibilityRules.objects.all()
     serializer_class = RetrieveEligibilityRulesSerializer
 
@@ -116,6 +174,8 @@ class ActivityViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Activity.objects.all()
     serializer_class = RetrieveActivitySerializer
 
@@ -129,6 +189,8 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
                             mixins.UpdateModelMixin,
                             mixins.CreateModelMixin):
     
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = QuestionnaireTemplate.objects.all()
     serializer_class = RetrieveQuestionnaireTemplateSerializer
     
@@ -214,9 +276,13 @@ class StudentResponse(viewsets.GenericViewSet,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
+
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = StudentResponse.objects.all()
     serializer_class = RetrieveStudentResponseSerializer
 
+    
     def update(self, request, *args, **kwargs):
         response_query = request.POST.get("response")
         validateJson = self.validateResponseJson(response_query)
@@ -277,7 +343,8 @@ class UserResponse(viewsets.GenericViewSet):
     data. Return dict with two keys. 'type' is either 'student' or 'supervisor', and 'info' is the Student/Supervisor
     QuerySet as an object. If the Student or Supervisor is not found, a 500 Response is sent.
     """
-
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     lookup_value_regex = '[^/]+'
 
     def retrieve(self, request, pk=None):
