@@ -5,21 +5,19 @@ from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
 from rest_framework.permissions import BasePermission, IsAuthenticated
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from authentication.api.permissions import HasGroupPermission
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-
-    permission_classes = [HasGroupPermission]
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
+    permission_classes = [HasGroupPermission]
     required_groups = {
-         'GET': ['student'],
-         'POST': ['student'],
-         'PUT': ['student'],
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
      }
 
     def get_paginated_response(self, data):
@@ -29,10 +27,14 @@ class CourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Course.objects.all()
     serializer_class = RetrieveCourseSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -41,10 +43,14 @@ class SupervisorViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Supervisor.objects.all()
     serializer_class = RetrieveSupervisorSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -53,10 +59,14 @@ class CompanyViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
     serializer_class = RetrieveCompanySerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -65,10 +75,14 @@ class PlacementViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Placement.objects.all()
     serializer_class = RetrievePlacementSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -77,10 +91,14 @@ class UnitViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Unit.objects.all()
     serializer_class = RetrieveUnitSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -91,10 +109,14 @@ class ApplicationViewSet(viewsets.GenericViewSet,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Application.objects.all()
     serializer_class = RetrieveApplicationSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -103,10 +125,14 @@ class InterviewViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Interview.objects.all()
     serializer_class = RetrieveInterviewSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -115,10 +141,14 @@ class UnitCourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = UnitCourse.objects.all()
     serializer_class = RetrieveUnitCourseSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -127,10 +157,14 @@ class EligibilityRulesViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = EligibilityRules.objects.all()
     serializer_class = RetrieveEligibilityRulesSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -139,10 +173,14 @@ class ActivityViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Activity.objects.all()
     serializer_class = RetrieveActivitySerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -154,10 +192,14 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
                             mixins.UpdateModelMixin,
                             mixins.CreateModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = QuestionnaireTemplate.objects.all()
     serializer_class = RetrieveQuestionnaireTemplateSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def list(self, request, *args, **kwargs):
         active_query = request.query_params.get('active', None)
@@ -242,11 +284,14 @@ class StudentResponse(viewsets.GenericViewSet,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = StudentResponse.objects.all()
     serializer_class = RetrieveStudentResponseSerializer
-
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def update(self, request, *args, **kwargs):
         response_query = request.POST.get("response")
@@ -308,9 +353,14 @@ class UserResponse(viewsets.GenericViewSet):
     data. Return dict with two keys. 'type' is either 'student' or 'supervisor', and 'info' is the Student/Supervisor
     QuerySet as an object. If the Student or Supervisor is not found, a 500 Response is sent.
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+
     lookup_value_regex = '[^/]+'
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def retrieve(self, request, pk=None):
         if pk is None:
