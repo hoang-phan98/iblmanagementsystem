@@ -302,9 +302,11 @@ class StudentandUnitViewset(viewsets.GenericViewSet,
     def get_paginated_response(self, data):
         return Response(data)
         
+        
 class CourseMapSnapshotViewset(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin):
+                   mixins.RetrieveModelMixin,
+                   mixins.CreateModelMixin):
     queryset = CourseMapSnapshot.objects.all()
     serializer_class = RerieveCourseMapSnapshotSerializer
     def get_paginated_response(self, data):
