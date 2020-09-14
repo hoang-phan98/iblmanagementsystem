@@ -18,7 +18,7 @@ from django.urls import include, path
 from django.conf.urls import url
 
 from core.api.urls import router as core_router
-from core.api.views import GoogleLogin
+from authentication.api.views import GoogleLogin
 from eligibility.api.urls import router as eligibility_router
 
 from rest_framework import permissions

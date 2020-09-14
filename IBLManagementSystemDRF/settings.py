@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'IBLManagementSystemDRF',
+    'authentication',
     'core',
     'corsheaders',
     'django_s3_sqlite',
