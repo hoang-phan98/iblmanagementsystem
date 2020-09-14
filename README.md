@@ -204,6 +204,11 @@ Install the dependencies (only needs to be done once)
 $ pip install -r requirements.txt
 ```
 
+Create a `.env` file in the project root (easiest way is to copy `.env.example`):
+```
+cp .env.example .env
+```
+
 If changes were made to the database you need to `makemigrations` which creates a file that defines how the database changed from the last version
 ```
 $ python manage.py makemigrations
@@ -236,3 +241,13 @@ Create a database with the following credentials:
 name: ibl-dev
 owner: admin
 ```
+
+## Environment variables
+[Django-environ](https://django-environ.readthedocs.io/en/latest/
+) is used to read environment variables from the `.env` file.
+The current environment variables are used:
+- DATABASE_URL: URL for the remote database (used in deployments).
+   This needs to be in the format listed in the Django-environ docs under `db_url`.
+- LOCAL_DATABASE_URL: URL for local development database. Also needs to be in `db_url` format.
+- USE_REMOTE_DB: boolean, default `False`.
+If `True`, `DATABASE_URL` is used; if `False`, `LOCAL_DATABASE_URL` is used.

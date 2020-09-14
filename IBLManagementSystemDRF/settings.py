@@ -105,7 +105,7 @@ if IS_LAMBDA or USE_REMOTE_DB:
 
 else:
     DATABASES = {
-        'default': env.db('SQLITE_URL', default="sqlite:///db.sqlite3")
+        'default': env.db('LOCAL_DATABASE_URL')
     }
 
 # Password validation
