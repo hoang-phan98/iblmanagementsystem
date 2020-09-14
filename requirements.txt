@@ -1,13 +1,13 @@
 asgiref==3.2.7
 Django==3.0.7
 django-cors-headers==3.4.0
-django-s3-sqlite==0.0.3
 djangorestframework==3.11.0
 pytz==2020.1
 sqlparse==0.3.1
 whitenoise==5.1.0
 zappa==0.51.0
 drf-yasg==1.17.0
-psycopg2==2.8.6
+psycopg2-binary==2.8.6
 django-rest-auth==0.9.5
 django-allauth==0.42.0
+django-environ==0.4.5

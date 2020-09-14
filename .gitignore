@@ -1,3 +1,6 @@
+# For django-environ
+.env
+
 /IBLManagementSystemDRFVenv
 
 # Django #

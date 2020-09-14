@@ -11,6 +11,15 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import environ
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+env = environ.Env(
+    USE_REMOTE_DB=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Detect whether running on Lambda
 IS_LAMBDA = bool(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
@@ -21,8 +30,6 @@ if IS_LAMBDA and (not ZAPPA_STAGE or not ZAPPA_PROJECT):
     raise RuntimeError(
         "Zappa STAGE and PROJECT env variables must be defined when running in a Lambda")
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -57,7 +64,6 @@ INSTALLED_APPS = [
     'authentication',
     'core',
     'corsheaders',
-    'django_s3_sqlite',
     'drf_yasg',
 ]
 
@@ -99,31 +105,16 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# SQLite config, TODO: Postgres config
-# Override old sqlite3 on Lambda
-if IS_LAMBDA:
-    import sys
-    sys.modules['sqlite3'] = __import__('pysqlite3')
+USE_REMOTE_DB = env('USE_REMOTE_DB')
+if IS_LAMBDA or USE_REMOTE_DB:
     DATABASES = {
-        'default': {
-            "ENGINE": 'django_s3_sqlite',
-            "NAME": f'{ZAPPA_PROJECT}-{ZAPPA_STAGE}.db',
-            "BUCKET": 'fit3170-ibl-lambda-db',
-        }
+        'default': env.db()
     }
 
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'ibl-dev',
-            'USER': 'admin',
-            'PASSWORD': 'admin',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
+        'default': env.db('LOCAL_DATABASE_URL')
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
