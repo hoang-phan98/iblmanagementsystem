@@ -4,7 +4,8 @@ from .serializers import *
 from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
-
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from authentication.api.permissions import HasGroupPermission
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -12,6 +13,12 @@ class StudentViewSet(viewsets.GenericViewSet,
 
     queryset = Student.objects.all()
     serializer_class = RetrieveStudentSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -22,6 +29,12 @@ class CourseViewSet(viewsets.GenericViewSet,
 
     queryset = Course.objects.all()
     serializer_class = RetrieveCourseSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -32,6 +45,12 @@ class SupervisorViewSet(viewsets.GenericViewSet,
 
     queryset = Supervisor.objects.all()
     serializer_class = RetrieveSupervisorSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -42,6 +61,12 @@ class CompanyViewSet(viewsets.GenericViewSet,
 
     queryset = Company.objects.all()
     serializer_class = RetrieveCompanySerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -52,6 +77,12 @@ class PlacementViewSet(viewsets.GenericViewSet,
 
     queryset = Placement.objects.all()
     serializer_class = RetrievePlacementSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -62,6 +93,12 @@ class UnitViewSet(viewsets.GenericViewSet,
 
     queryset = Unit.objects.all()
     serializer_class = RetrieveUnitSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -74,6 +111,12 @@ class ApplicationViewSet(viewsets.GenericViewSet,
 
     queryset = Application.objects.all()
     serializer_class = RetrieveApplicationSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -84,6 +127,12 @@ class InterviewViewSet(viewsets.GenericViewSet,
 
     queryset = Interview.objects.all()
     serializer_class = RetrieveInterviewSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -94,6 +143,12 @@ class UnitCourseViewSet(viewsets.GenericViewSet,
 
     queryset = UnitCourse.objects.all()
     serializer_class = RetrieveUnitCourseSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -104,6 +159,12 @@ class EligibilityRulesViewSet(viewsets.GenericViewSet,
 
     queryset = EligibilityRules.objects.all()
     serializer_class = RetrieveEligibilityRulesSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -114,27 +175,39 @@ class ActivityViewSet(viewsets.GenericViewSet,
 
     queryset = Activity.objects.all()
     serializer_class = RetrieveActivitySerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def get_paginated_response(self, data):
         return Response(data)
 
-class QuestionnaireTemplateViewSet(viewsets.GenericViewSet, 
-                            mixins.ListModelMixin, 
+class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
+                            mixins.ListModelMixin,
                             mixins.DestroyModelMixin,
                             mixins.RetrieveModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.CreateModelMixin):
-    
+
     queryset = QuestionnaireTemplate.objects.all()
     serializer_class = RetrieveQuestionnaireTemplateSerializer
-    
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
+
     def list(self, request, *args, **kwargs):
         active_query = request.query_params.get('active', None)
         #If no parameter is given then just use the ListModelMixin to list all the tasks.
         if active_query is None:
             return super().list(request, *args, **kwargs)
-        
-        # Attempt to retrieve instance 
+
+        # Attempt to retrieve instance
         try:
             if active_query.lower() == "true":
                 active_query = True
@@ -157,19 +230,19 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
     def create(self, request, *args, **kwargs):
         response_query = request.POST.get("questions") #Query_params didn't work, but POST.get did?
        # response_query = request.query_params.get("response",None)
-        
+
         validateJson = self.validateTemplateJson(response_query)
         if response_query is None or validateJson != "":
             return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
-        
-           
+
+
     """
         The validateTemplateJson function for the student response class ensures that a string given can be converted to
         JSON. Valid JSON formats conform to following:
             questions: [{"question": "question here", "format": "A format to display the question on the frontend"}]
-            To further elaborate format, this field can be used to specify how the question should be presented. 
+            To further elaborate format, this field can be used to specify how the question should be presented.
             For example if the question was a radio button selection the format may be: radio buttons
 
         Parameters:
@@ -180,27 +253,27 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
     def validateTemplateJson(self, json_object):
         try:
             json_data = json.loads(json_object) #This won't be needed if we use JSONField
-            
+
             #Checking that there aren't any fields other than the response and the only key is response
             if len(json_data) > 1:
                 return "There are too many keys in the JSON object. Only 'questions' should be present."
-            
+
             #If accessing response doesn't work then there's a key error and this will return false
             response_array = json_data['questions']
 
             #Checking that all the fields are the specified format.
             if len(response_array) == 0:
-                return "questions is empty." 
+                return "questions is empty."
 
             for i in range(len(response_array)):
                 keys = list(response_array[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'format' or len(keys) != 2:
                     return "Invalid key in response array."
-            
+
             return ""
         except:
             return "Invalid JSON object or no 'questions' key present in object."
-    
+
     def get_paginated_response(self,data):
         return Response(data)
 
@@ -210,8 +283,15 @@ class StudentResponse(viewsets.GenericViewSet,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
+
     queryset = StudentResponse.objects.all()
     serializer_class = RetrieveStudentResponseSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def update(self, request, *args, **kwargs):
         response_query = request.POST.get("response")
@@ -229,8 +309,8 @@ class StudentResponse(viewsets.GenericViewSet,
             return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
-        
-           
+
+
     """
         The validateResponseJson function for the student response class ensures that a string given can be converted to
         JSON and it contains only the specified keys of 'question' and 'answer'
@@ -242,11 +322,11 @@ class StudentResponse(viewsets.GenericViewSet,
     def validateResponseJson(self, json_object):
         try:
             json_data = json.loads(json_object) #This won't be needed if we use JSONField
-            
+
             #Checking that there aren't any fields other than the response and the only key is response
             if len(json_data) > 1:
                 return "There are too many keys in the JSON object. Only 'response' should be present."
-            
+
             #If accessing response doesn't work then there's a key error and this will return false
             response_array = json_data['response']
 
@@ -258,12 +338,12 @@ class StudentResponse(viewsets.GenericViewSet,
                 keys = list(response_array[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'answer' or len(keys) != 2:
                     return "Invalid key in response array."
-            
+
             return ""
         except:
             return "Invalid JSON object or no 'response' key present in object."
-        
-        
+
+
     def get_paginated_response(self, data):
         return Response(data)
 
@@ -275,6 +355,12 @@ class UserResponse(viewsets.GenericViewSet):
     """
 
     lookup_value_regex = '[^/]+'
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
 
     def retrieve(self, request, pk=None):
         if pk is None:
@@ -297,10 +383,18 @@ class UserResponse(viewsets.GenericViewSet):
 class StudentandUnitViewset(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
-
     queryset = StudentandUnit.objects.all()
     serializer_class = RetrieveStudentandUnitSerializer
-
+    def get_paginated_response(self, data):
+        return Response(data)
+        
+        
+class CourseMapSnapshotViewset(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.CreateModelMixin):
+    queryset = CourseMapSnapshot.objects.all()
+    serializer_class = RerieveCourseMapSnapshotSerializer
     def get_paginated_response(self, data):
         return Response(data)
         

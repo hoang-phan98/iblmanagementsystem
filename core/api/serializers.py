@@ -72,6 +72,11 @@ class RetrieveStudentandUnitSerializer(serializers.ModelSerializer):
         model = StudentandUnit
         fields = ["id", "student", "unit", "year", "semester", "Pass"]
 
+class RerieveCourseMapSnapshotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseMapSnapshot
+        fields = ["id", "Snapshot", "application", "approval"]
+
 # class RetrievePrereqConjunction(serializers.ModelSerializer):
 #     class Meta:
 #         model = PrereqConjunction

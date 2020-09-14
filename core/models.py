@@ -105,3 +105,10 @@ class StudentandUnit(models.Model):
     semester = models.PositiveIntegerField()
     Pass = models.BooleanField()
     
+
+
+class CourseMapSnapshot(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    Snapshot = models.TextField() 
+    approval = models.BooleanField()
