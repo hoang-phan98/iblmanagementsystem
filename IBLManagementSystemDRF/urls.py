@@ -18,6 +18,7 @@ from django.urls import include, path
 from django.conf.urls import url
 
 from core.api.urls import router as core_router
+from authentication.api.views import GoogleLogin
 from eligibility.api.urls import router as eligibility_router
 
 from rest_framework import permissions
@@ -39,6 +40,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/google_login/', GoogleLogin.as_view(), name="Google-login"),
     path('api/core/', include(core_router.urls)),
     path('api/eligibility/', include(eligibility_router.urls)),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
