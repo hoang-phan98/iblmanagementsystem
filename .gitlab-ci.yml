@@ -28,7 +28,7 @@ stages:
     - source env/bin/activate
     - pip install -r requirements.txt
     # Make Django migrations before deploying package to Lambda
-    - python manage.py makemigrations
+    - USE_REMOTE_DB=True python manage.py makemigrations  # Need to ensure remote DB is used for this
   script:
     # creating aws credentials file
     - mkdir -p ~/.aws

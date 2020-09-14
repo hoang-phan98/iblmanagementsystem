@@ -17,7 +17,6 @@ import environ
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 env = environ.Env(
-    # Set this locally if you want to connect to Postgres
     USE_REMOTE_DB=(bool, False)
 )
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
@@ -96,7 +95,6 @@ WSGI_APPLICATION = 'IBLManagementSystemDRF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# Default: SQLite locally, Postgres remotely
 USE_REMOTE_DB = env('USE_REMOTE_DB')
 if IS_LAMBDA or USE_REMOTE_DB:
     DATABASES = {
