@@ -80,7 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SITE_ID = 1 #For authentication
+SITE_ID = 5 #For authentication
 
 ROOT_URLCONF = 'IBLManagementSystemDRF.urls'
 
