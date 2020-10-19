@@ -397,6 +397,31 @@ class CourseMapSnapshotViewset(viewsets.GenericViewSet,
     serializer_class = RerieveCourseMapSnapshotSerializer
     def get_paginated_response(self, data):
         return Response(data)
+
+    def validateSnapshotJson(self, json_object):
+        try:
+            json_data = json.loads(json_object) #This won't be needed if we use JSONField
+
+            #Checking that there aren't any fields other than the snapshot and the only key is snapshot
+            if len(json_data) > 1:
+                return "There are too many keys in the JSON object. Only 'snapshot' should be present."
+
+            #If accessing snapshot doesn't work then there's a key error and this will return false
+            snapshot_array = json_data['snapshot']
+
+            #Checking that all the fields are the specified format.
+            if len(snapshot_array) == 0:
+                return "snapshot is empty."
+
+            for i in range(len(snapshot_array)):
+                keys = list(snapshot_array[i].keys())
+                if keys[0].lower() != 'unitname' or keys[1].lower() != 'year'or keys[2].lower() != 'semester'or keys[3].lower() != 'creditpoint' or keys[4].lower() != 'status'or len(keys) != 5:
+                    return "Invalid key in snapshot array."
+
+            return ""
+        except:
+            return "Invalid JSON object or no 'snapshot' key present in object."
+
         
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
