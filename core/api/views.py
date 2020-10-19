@@ -219,20 +219,15 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        response_query = request.POST.get("questions")
-
-        validateJson = self.validateTemplateJson(response_query)
+        validateJson = self.validateTemplateJson(request.data)
         if response_query is None or validateJson != "":
             return Response(validateJson)
 
         return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        response_query = request.POST.get("questions") #Query_params didn't work, but POST.get did?
-       # response_query = request.query_params.get("response",None)
-
-        validateJson = self.validateTemplateJson(response_query)
-        if response_query is None or validateJson != "":
+        validateJson = self.validateTemplateJson(request.data)
+        if validateJson != "":
             return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
@@ -246,27 +241,20 @@ class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
             For example if the question was a radio button selection the format may be: radio buttons
 
         Parameters:
-            json_object - a string to validate
+            request_data: The data from the request
         Returns:
             A boolean of if the string meets the above requirements.
     """
-    def validateTemplateJson(self, json_object):
+    def validateTemplateJson(self, request_data):
         try:
-            json_data = json.loads(json_object) #This won't be needed if we use JSONField
-
-            #Checking that there aren't any fields other than the response and the only key is response
-            if len(json_data) > 1:
-                return "There are too many keys in the JSON object. Only 'questions' should be present."
-
-            #If accessing response doesn't work then there's a key error and this will return false
-            response_array = json_data['questions']
+            questions = json.loads(request_data["questions"]) 
 
             #Checking that all the fields are the specified format.
-            if len(response_array) == 0:
+            if len(questions) == 0:
                 return "questions is empty."
 
-            for i in range(len(response_array)):
-                keys = list(response_array[i].keys())
+            for i in range(len(questions)):
+                keys = list(questions[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'format' or len(keys) != 2:
                     return "Invalid key in response array."
 
@@ -294,18 +282,15 @@ class StudentResponse(viewsets.GenericViewSet,
      }
 
     def update(self, request, *args, **kwargs):
-        response_query = request.POST.get("response")
-        validateJson = self.validateResponseJson(response_query)
-        if response_query is None or validateJson != "":
+        validateJson = self.validateResponseJson(request.data)
+        if validateJson != "":
             return Response(validateJson)
 
         return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        response_query = request.POST.get("response") #Query_params didn't work, but POST.get did?
-       # response_query = request.query_params.get("response",None)
-        validateJson = self.validateResponseJson(response_query)
-        if response_query is None or validateJson != "":
+        validateJson = self.validateResponseJson(request.data)
+        if validateJson != "":
             return Response(validateJson)
 
         return super().create(request, *args, **kwargs)
@@ -319,23 +304,17 @@ class StudentResponse(viewsets.GenericViewSet,
         Returns:
             A boolean of if the string meets the above requirements.
     """
-    def validateResponseJson(self, json_object):
+    def validateResponseJson(self, request_data):
         try:
-            json_data = json.loads(json_object) #This won't be needed if we use JSONField
 
-            #Checking that there aren't any fields other than the response and the only key is response
-            if len(json_data) > 1:
-                return "There are too many keys in the JSON object. Only 'response' should be present."
-
-            #If accessing response doesn't work then there's a key error and this will return false
-            response_array = json_data['response']
+            responses = json.loads(request_data["response"]) 
 
             #Checking that all the fields are the specified format.
-            if len(response_array) == 0:
-                return "Response is empty."
+            if len(responses) == 0:
+                return "There are no question and answers present."
 
-            for i in range(len(response_array)):
-                keys = list(response_array[i].keys())
+            for i in range(len(responses)):
+                keys = list(responses[i].keys())
                 if keys[0].lower() != 'question' or keys[1].lower() != 'answer' or len(keys) != 2:
                     return "Invalid key in response array."
 
