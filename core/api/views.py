@@ -6,6 +6,7 @@ from ..models import *
 import json
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from authentication.api.permissions import HasGroupPermission
+from django.shortcuts import get_object_or_404
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -120,6 +121,48 @@ class ApplicationViewSet(viewsets.GenericViewSet,
 
     def get_paginated_response(self, data):
         return Response(data)
+
+    def list(self, request, *args, **kwargs):
+
+        # Get current user
+        user = self.request.user
+
+        # If user is staff, show all applications
+        if self.is_member(user, "Staff"):
+            query_set = Application.objects.all()
+
+        # If user is student, show relevant application
+        elif self.is_member(user, "Student"):
+            query_set = Application.objects.filter(student__email__contains=user.email)
+
+        else:
+            query_set = None
+
+        serializer = RetrieveApplicationSerializer(query_set, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+
+        # Get current user
+        user = self.request.user
+
+        # If user is staff, show application
+        if self.is_member(user, "Staff"):
+            query_set = Application.objects.all()
+            application = get_object_or_404(query_set, pk=pk)
+
+        # If user is student, only show application if relevant
+        elif self.is_member(user, "Student"):
+            query_set = Application.objects.filter(student__email__contains=user.email)
+            application = get_object_or_404(query_set, pk=pk)
+        else:
+            application = None
+
+        serializer = RetrieveApplicationSerializer(application)
+        return Response(serializer.data)
+
+    def is_member(self, user, group):
+        return user.groups.filter(name=group).exists()
 
 class InterviewViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
