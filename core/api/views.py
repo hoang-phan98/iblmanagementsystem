@@ -398,6 +398,15 @@ class CourseMapSnapshotViewset(viewsets.GenericViewSet,
     def get_paginated_response(self, data):
         return Response(data)
 
+
+    def create(self, request, *args, **kwargs):
+        snapshot_query = request.POST.get("snapshot") 
+        validateSnapshotJson = self.validateSnapshotJson(snapshot_query)
+        if snapshot_query is None or validateSnapshotJson != "":
+            return Response(validateSnapshotJson)
+
+        return super().create(request, *args, **kwargs)
+
     def validateSnapshotJson(self, json_object):
         try:
             json_data = json.loads(json_object) #This won't be needed if we use JSONField
@@ -421,6 +430,7 @@ class CourseMapSnapshotViewset(viewsets.GenericViewSet,
             return ""
         except:
             return "Invalid JSON object or no 'snapshot' key present in object."
+
 
         
 # class PrereqConjunctionViewSet(viewsets.GenericViewSet,
