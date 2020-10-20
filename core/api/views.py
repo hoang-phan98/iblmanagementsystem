@@ -380,11 +380,11 @@ class UserResponse(viewsets.GenericViewSet):
         }
         return HttpResponse(json.dumps(res), content_type='application/json')
 
-class StudentandUnitViewset(viewsets.GenericViewSet,
+class StudentUnitViewset(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin):
-    queryset = StudentandUnit.objects.all()
-    serializer_class = RetrieveStudentandUnitSerializer
+    queryset = StudentUnit.objects.all()
+    serializer_class = RetrieveStudentUnitSerializer
     def get_paginated_response(self, data):
         return Response(data)
         
