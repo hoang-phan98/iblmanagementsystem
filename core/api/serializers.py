@@ -67,9 +67,9 @@ class RetrieveStudentResponseSerializer(serializers.ModelSerializer):
         model = StudentResponse
         fields = ["id", "response"]
 
-class RetrieveStudentandUnitSerializer(serializers.ModelSerializer):
+class RetrieveStudentUnitSerializer(serializers.ModelSerializer):
     class Meta:
-        model = StudentandUnit
+        model = StudentUnit
         fields = ["id", "student", "unit", "year", "semester", "Pass"]
 
 class RerieveCourseMapSnapshotSerializer(serializers.ModelSerializer):

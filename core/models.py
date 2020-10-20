@@ -11,9 +11,9 @@ class Course(models.Model):
 class Unit(models.Model):
     code = models.CharField(primary_key=True, max_length=7, editable=True, validators=[validate_unit_code])
     name = models.CharField(max_length=256)
-    year = models.PositiveIntegerField(validators=[validate_year])
-    semester = models.PositiveIntegerField()
     is_ibl_unit = models.BooleanField()
+    credit_points = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField()
 
 class UnitCourse(models.Model):
     class Meta:
@@ -21,6 +21,8 @@ class UnitCourse(models.Model):
 
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    year = models.PositiveIntegerField(validators=[validate_year])
+    semester = models.PositiveIntegerField()
 
 class Supervisor(models.Model):
     id = models.CharField(primary_key=True, max_length=10, editable=True)
@@ -97,7 +99,7 @@ class StudentResponse(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     response = models.TextField()
 
-class StudentandUnit(models.Model):
+class StudentUnit(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
