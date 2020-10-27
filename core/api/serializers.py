@@ -30,12 +30,12 @@ class RetrieveCompanySerializer(serializers.ModelSerializer):
 class RetrieveUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Unit
-        fields = ["code", "name", "year", "semester", "is_ibl_unit"]
+        fields = ["code", "name", "is_ibl_unit", "credit_points", "duration"]
 
 class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UnitCourse
-        fields = ["unit", "course"]
+        fields = ["unit", "course", "year", "semester"]
 
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
