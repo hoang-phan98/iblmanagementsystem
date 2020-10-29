@@ -75,3 +75,11 @@ def validate_year(year):
     if len(str(year)) != 4:
         raise ValidationError("Please enter a valid year")
     return year
+
+def validate_unitcourse_year(year):
+    """
+    Validate a given year field - must be an integer that is 1,2,3,4,5
+    """
+    if type(year) != int or year < 1:
+        raise ValidationError("Please enter a valid year - an integer greater than 0.")
+    return year

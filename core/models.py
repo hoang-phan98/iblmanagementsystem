@@ -21,7 +21,7 @@ class UnitCourse(models.Model):
 
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    year = models.PositiveIntegerField(validators=[validate_year])
+    year = models.PositiveIntegerField(validators=[validate_unitcourse_year])
     semester = models.PositiveIntegerField()
 
 class Supervisor(models.Model):
