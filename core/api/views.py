@@ -179,6 +179,31 @@ class InterviewSlotViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixin
      }
 
 
+    """
+        The list function overrides the ListModelMixin list function to also provide the functionality
+        of providing a start and end date to filter the time slots returned when considering the day (not time)
+        If none is provided then the origin ListModelMixin list function is utilised.
+        Add /?start=year,month,day&end=year,month,day to the end of the url to filter
+    """
+    def list(self, request, *args, **kwargs):
+        start = request.query_params.get('start', None)
+        end = request.query_params.get('end', None)
+
+        if start is None or end is None:
+            return super().list(request, args, kwargs)
+        
+        try:
+           start = list(map(int, start.split(",")))
+           end = list(map(int, end.split(",")))
+           start = datetime.datetime(start[0], start[1], start[2])
+           end = datetime.datetime(end[0], end[1], end[2])
+           slots = InterviewSlot.objects.filter(date__range=[start,end])
+           serializer = RetrieveInterviewSlotSerializer(slots, many=True)
+           return Response({"data": serializer.data, "error": ""})
+        except:
+           return Response({"data":"", "error": "Error when filtering the range of dates"})
+
+
 
     """
         The createbatch method provides a way to create a batch of interview times in a single
@@ -193,10 +218,10 @@ class InterviewSlotViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixin
     @action(detail=False, methods=['post'])
     def createbatch(self, request, *args, **kwargs):
         if "time_slots" not in request.data.keys():
-            return Response({"error": "Missing 'time_slots' key in the request"})
+            return Response({"data": "", "error": "Missing 'time_slots' key in the request"})
 
         if type(request.data["time_slots"]) != list:
-            return Response({"error": "time_slots key data is not a list"})
+            return Response({"data":"", "error": "time_slots key data is not a list"})
 
         created_slots = []
 
