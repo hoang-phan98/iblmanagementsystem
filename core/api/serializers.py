@@ -42,6 +42,11 @@ class RetrieveApplicationSerializer(serializers.ModelSerializer):
         model = Application
         fields = ["status", "student", "date_started", "date_completed", "year_preference","semester_preference"]
 
+class RetrieveInterviewSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewSlot
+        fields = ["id","date"]
+
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview

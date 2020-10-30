@@ -7,6 +7,8 @@ import json
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from authentication.api.permissions import HasGroupPermission
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+import datetime
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -163,6 +165,59 @@ class ApplicationViewSet(viewsets.GenericViewSet,
 
     def is_member(self, user, group):
         return user.groups.filter(name=group).exists()
+
+class InterviewSlotViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin,
+                            mixins.CreateModelMixin, mixins.DestroyModelMixin):
+   
+    queryset = InterviewSlot.objects.all()
+    serializer_class = RetrieveInterviewSlotSerializer
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+         'GET': ['student', 'staff'],
+         'POST': ['student', 'staff'],
+         'PUT': ['student', 'staff'],
+     }
+
+
+
+    """
+        The createbatch method provides a way to create a batch of interview times in a single
+        request rather than having to make multiple requests for each. Note that it is possible
+        for there to be multiples of the same time as there may be more than one interviewer. 
+        Parameters:
+            request - Request should be a JSON/dict object that includes the key time_slots. time_slots
+                requires to be a list of lists. Each inner list should contain the following integers:
+                [year, month, day, hour (24 hour time), minute]
+
+    """
+    @action(detail=False, methods=['post'])
+    def createbatch(self, request, *args, **kwargs):
+        if "time_slots" not in request.data.keys():
+            return Response({"error": "Missing 'time_slots' key in the request"})
+
+        if type(request.data["time_slots"]) != list:
+            return Response({"error": "time_slots key data is not a list"})
+
+        created_slots = []
+
+        for i, timeslot in enumerate(request.data["time_slots"]):
+            try:
+                new_date_time = datetime.datetime(timeslot[0],timeslot[1],timeslot[2], hour=timeslot[3], minute=timeslot[4])
+                created_model = InterviewSlot.objects.create(date=new_date_time)
+                created_slots.append(created_model.id)
+            except:
+                return Response({"data": created_slots,
+                                "error": "Error when processing a date. Index of date that failed was: " + str(i)})
+
+        return Response({"data":created_slots,"error":""})
+        #super().create
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+
+
+
 
 class InterviewViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
