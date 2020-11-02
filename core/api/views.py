@@ -4,9 +4,19 @@ from .serializers import *
 from django.http import HttpResponse, HttpResponseServerError
 from ..models import *
 import json
+from uuid import UUID
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from authentication.api.permissions import HasGroupPermission
 from django.shortcuts import get_object_or_404
+
+
+# https://stackoverflow.com/questions/36588126/uuid-is-not-json-serializable
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+        return json.JSONEncoder.default(self, obj)
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -400,7 +410,7 @@ class UserResponse(viewsets.GenericViewSet):
             'type': 'student' if is_student else 'supervisor',
             'info': s.data
         }
-        return HttpResponse(json.dumps(res), content_type='application/json')
+        return HttpResponse(json.dumps(res, cls=UUIDEncoder), content_type='application/json')
 
 class StudentUnitViewset(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
