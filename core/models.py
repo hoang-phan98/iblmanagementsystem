@@ -78,19 +78,19 @@ class Application(models.Model):
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-class InterviewSlot(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateTimeField()
-
 class Interview(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    time = models.ForeignKey(InterviewSlot, blank=True, null=True, on_delete=models.SET_NULL)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, blank=True)
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+    title = models.TextField()
+    notes = models.TextField(blank=True)
+    # ----------
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, blank=True)
     location = models.CharField(max_length=256, blank=True)
     outcome_details = models.CharField(max_length=1, blank=True, choices=[("S", "Successful"), ("U", "Unsuccessful")])
-    application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True)
-    staff = models.ForeignKey(Supervisor, on_delete=models.CASCADE, blank=True)
 
 class QuestionnaireTemplate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

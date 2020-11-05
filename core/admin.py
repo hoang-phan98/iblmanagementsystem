@@ -8,7 +8,6 @@ from .models import *
 
 admin.site.register(Course)
 admin.site.register(Interview)
-admin.site.register(InterviewSlot)
 admin.site.register(Supervisor)
 admin.site.register(Student)
 admin.site.register(Company)

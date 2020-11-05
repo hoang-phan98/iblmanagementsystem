@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from .serializers import *
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest
 from ..models import *
 import json
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -9,6 +9,8 @@ from authentication.api.permissions import HasGroupPermission
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 import datetime
+import dateutil
+from rest_framework import status
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -166,99 +168,93 @@ class ApplicationViewSet(viewsets.GenericViewSet,
     def is_member(self, user, group):
         return user.groups.filter(name=group).exists()
 
-class InterviewSlotViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                            mixins.CreateModelMixin, mixins.DestroyModelMixin):
-   
-    queryset = InterviewSlot.objects.all()
-    serializer_class = RetrieveInterviewSlotSerializer
-    permission_classes = [HasGroupPermission]
-    required_groups = {
-         'GET': ['student', 'staff'],
-         'POST': ['student', 'staff'],
-         'PUT': ['student', 'staff'],
-     }
-
-
-    """
-        The list function overrides the ListModelMixin list function to also provide the functionality
-        of providing a start and end date to filter the time slots returned when considering the day (not time)
-        If none is provided then the origin ListModelMixin list function is utilised.
-        Add /?start=year,month,day&end=year,month,day to the end of the url to filter
-    """
-    def list(self, request, *args, **kwargs):
-        start = request.query_params.get('start', None)
-        end = request.query_params.get('end', None)
-
-        if start is None or end is None:
-            return super().list(request, args, kwargs)
-        
-        try:
-           start = list(map(int, start.split(",")))
-           end = list(map(int, end.split(",")))
-           start = datetime.datetime(start[0], start[1], start[2])
-           end = datetime.datetime(end[0], end[1], end[2])
-           slots = InterviewSlot.objects.filter(date__range=[start,end])
-           serializer = RetrieveInterviewSlotSerializer(slots, many=True)
-           return Response({"data": serializer.data, "error": ""})
-        except:
-           return Response({"data":"", "error": "Error when filtering the range of dates"})
-
-
-
-    """
-        The createbatch method provides a way to create a batch of interview times in a single
-        request rather than having to make multiple requests for each. Note that it is possible
-        for there to be multiples of the same time as there may be more than one interviewer. 
-        Parameters:
-            request - Request should be a JSON/dict object that includes the key time_slots. time_slots
-                requires to be a list of lists. Each inner list should contain the following integers:
-                [year, month, day, hour (24 hour time), minute]
-
-    """
-    @action(detail=False, methods=['post'])
-    def createbatch(self, request, *args, **kwargs):
-        if "time_slots" not in request.data.keys():
-            return Response({"data": "", "error": "Missing 'time_slots' key in the request"})
-
-        if type(request.data["time_slots"]) != list:
-            return Response({"data":"", "error": "time_slots key data is not a list"})
-
-        created_slots = []
-
-        for i, timeslot in enumerate(request.data["time_slots"]):
-            try:
-                new_date_time = datetime.datetime(timeslot[0],timeslot[1],timeslot[2], hour=timeslot[3], minute=timeslot[4])
-                created_model = InterviewSlot.objects.create(date=new_date_time)
-                created_slots.append(created_model.id)
-            except:
-                return Response({"data": created_slots,
-                                "error": "Error when processing a date. Index of date that failed was: " + str(i)})
-
-        return Response({"data":created_slots,"error":""})
-        #super().create
-
-    def get_paginated_response(self, data):
-        return Response(data)
-
-
-
-
 
 class InterviewViewSet(viewsets.GenericViewSet,
-                   mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin):
+                       mixins.ListModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.UpdateModelMixin):
 
     queryset = Interview.objects.all()
     serializer_class = RetrieveInterviewSerializer
     permission_classes = [HasGroupPermission]
     required_groups = {
          'GET': ['student', 'staff'],
-         'POST': ['student', 'staff'],
+         'POST': ['staff'],
          'PUT': ['student', 'staff'],
      }
 
+    def update(self, request, *args, **kwargs):
+        json_data = json.loads(request.data)
+
+        user = self.request.user
+
+        if "id" not in json_data:
+            return HttpResponseBadRequest("Require ID field")
+
+        interview = Interview.objects.filter(id__exact=user.email).first()
+
+        # can update
+        if self.is_member(user, "Staff"):
+            supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
+
+            # dates in iso format
+            start_date = dateutil.parser.parse(json_data["start_date"])
+            end_date = dateutil.parser.parse(json_data["end_date"])
+
+            interview.supervisor=supervisor,
+            interview.title=json_data["title"],
+            interview.start_date=start_date,
+            interview.end_date=end_date,
+            interview.notes="" if "notes" not in json_data else json_data["notes"]
+            interview.save()
+        elif self.is_member(user, "Student"):  # only update student field
+            # unassign
+            if "student" not in json_data or json_data["student"] is None and interview.student.email == user.email:
+                interview.student = None
+                interview.save()
+            elif json_data["student"] == user.email and interview.student is None:  # assign
+                interview.student = Student.objects.filter(email__exact=user.email).first()
+                interview.save()
+        else:
+            return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+        interview.refresh_from_db()
+
+        serializer = RetrieveInterviewSerializer(interview)
+
+        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        json_data = json.loads(request.data)
+        required_keys = ("start_date", "end_date", "supervisor", "title")
+        if not all(key in json_data for key in required_keys):
+            # don't have all required keys
+            return HttpResponseBadRequest("Error: missing required keys")
+
+        supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
+
+        # dates in iso format
+        start_date = dateutil.parser.parse(json_data["start_date"])
+        end_date = dateutil.parser.parse(json_data["end_date"])
+
+        obj = Interview.objects.create(
+            supervisor=supervisor,
+            title=json_data["title"],
+            start_date=start_date,
+            end_date=end_date,
+            notes="" if "notes" not in json_data else json_data["notes"]
+        )
+
+        serializer = RetrieveInterviewSerializer(obj)
+
+        return HttpResponse(serializer.data, status=status.HTTP_201_CREATED)
+
     def get_paginated_response(self, data):
         return Response(data)
+
+    def is_member(self, user, group):
+        return user.groups.filter(name=group).exists()
 
 class UnitCourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
