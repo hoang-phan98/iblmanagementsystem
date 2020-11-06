@@ -45,7 +45,8 @@ class RetrieveApplicationSerializer(serializers.ModelSerializer):
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
-        fields = ["time", "location", "outcome_details", "student", "application", "company", "staff"]
+        fields = ["id", "start_date", "end_date", "location", "outcome_details", "student", "application",
+                  "company", "supervisor", "title", "notes"]
 
 class RetrieveEligibilityRulesSerializer(serializers.ModelSerializer):
     class Meta:

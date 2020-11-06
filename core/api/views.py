@@ -1,13 +1,17 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from .serializers import *
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest
 from ..models import *
 import json
 from uuid import UUID
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from authentication.api.permissions import HasGroupPermission
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+import datetime
+import dateutil
+from rest_framework import status
 
 
 # https://stackoverflow.com/questions/36588126/uuid-is-not-json-serializable
@@ -174,21 +178,93 @@ class ApplicationViewSet(viewsets.GenericViewSet,
     def is_member(self, user, group):
         return user.groups.filter(name=group).exists()
 
+
 class InterviewViewSet(viewsets.GenericViewSet,
-                   mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin):
+                       mixins.ListModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.UpdateModelMixin):
 
     queryset = Interview.objects.all()
     serializer_class = RetrieveInterviewSerializer
     permission_classes = [HasGroupPermission]
     required_groups = {
          'GET': ['student', 'staff'],
-         'POST': ['student', 'staff'],
+         'POST': ['staff'],
          'PUT': ['student', 'staff'],
      }
 
+    def update(self, request, *args, **kwargs):
+        json_data = json.loads(request.data)
+
+        user = self.request.user
+
+        if "id" not in json_data:
+            return HttpResponseBadRequest("Require ID field")
+
+        interview = Interview.objects.filter(id__exact=user.email).first()
+
+        # can update
+        if self.is_member(user, "Staff"):
+            supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
+
+            # dates in iso format
+            start_date = dateutil.parser.parse(json_data["start_date"])
+            end_date = dateutil.parser.parse(json_data["end_date"])
+
+            interview.supervisor=supervisor,
+            interview.title=json_data["title"],
+            interview.start_date=start_date,
+            interview.end_date=end_date,
+            interview.notes="" if "notes" not in json_data else json_data["notes"]
+            interview.save()
+        elif self.is_member(user, "Student"):  # only update student field
+            # unassign
+            if "student" not in json_data or json_data["student"] is None and interview.student.email == user.email:
+                interview.student = None
+                interview.save()
+            elif json_data["student"] == user.email and interview.student is None:  # assign
+                interview.student = Student.objects.filter(email__exact=user.email).first()
+                interview.save()
+        else:
+            return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+        interview.refresh_from_db()
+
+        serializer = RetrieveInterviewSerializer(interview)
+
+        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        json_data = json.loads(request.data)
+        required_keys = ("start_date", "end_date", "supervisor", "title")
+        if not all(key in json_data for key in required_keys):
+            # don't have all required keys
+            return HttpResponseBadRequest("Error: missing required keys")
+
+        supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
+
+        # dates in iso format
+        start_date = dateutil.parser.parse(json_data["start_date"])
+        end_date = dateutil.parser.parse(json_data["end_date"])
+
+        obj = Interview.objects.create(
+            supervisor=supervisor,
+            title=json_data["title"],
+            start_date=start_date,
+            end_date=end_date,
+            notes="" if "notes" not in json_data else json_data["notes"]
+        )
+
+        serializer = RetrieveInterviewSerializer(obj)
+
+        return HttpResponse(serializer.data, status=status.HTTP_201_CREATED)
+
     def get_paginated_response(self, data):
         return Response(data)
+
+    def is_member(self, user, group):
+        return user.groups.filter(name=group).exists()
 
 class UnitCourseViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
