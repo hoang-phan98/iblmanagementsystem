@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 import datetime
 import dateutil
 from rest_framework import status
+from django.db.models import Q
 
 class StudentViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
@@ -171,7 +172,6 @@ class ApplicationViewSet(viewsets.GenericViewSet,
 
 class InterviewViewSet(viewsets.GenericViewSet,
                        mixins.ListModelMixin,
-                       mixins.RetrieveModelMixin,
                        mixins.CreateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.UpdateModelMixin):
@@ -183,7 +183,36 @@ class InterviewViewSet(viewsets.GenericViewSet,
          'GET': ['student', 'staff'],
          'POST': ['staff'],
          'PUT': ['student', 'staff'],
+         'DELETE': ['staff'],
      }
+
+    def destroy(self, request, *args, **kwargs):
+        json_data = json.loads(request.data)
+        if "id" not in json_data:
+            return HttpResponseBadRequest("Require ID field")
+        obj = Interview.objects.get(id=json_data["id"])
+        if obj:
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return HttpResponseBadRequest("Object doesn't exist")
+
+    def list(self, request, *args, **kwargs):
+        # Get current user
+        user = self.request.user
+
+        # If user is staff, show all interviews
+        if self.is_member(user, "Staff"):
+            query_set = Interview.objects.all()
+
+        # If user is student, show relevant interviews (theirs + empty)
+        elif self.is_member(user, "Student"):
+            query_set = Interview.objects.filter(Q(student__isnull=True) | Q(student__email__contains=user.email))
+        else:
+            query_set = None
+
+        serializer = RetrieveInterviewSerializer(query_set, many=True)
+        return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
         json_data = json.loads(request.data)
@@ -203,22 +232,20 @@ class InterviewViewSet(viewsets.GenericViewSet,
             start_date = dateutil.parser.parse(json_data["start_date"])
             end_date = dateutil.parser.parse(json_data["end_date"])
 
-            interview.supervisor=supervisor,
-            interview.title=json_data["title"],
-            interview.start_date=start_date,
-            interview.end_date=end_date,
-            interview.notes="" if "notes" not in json_data else json_data["notes"]
-            interview.save()
+            interview.supervisor = supervisor,
+            interview.title = json_data["title"],
+            interview.start_date = start_date,
+            interview.end_date = end_date,
+            interview.notes = "" if "notes" not in json_data else json_data["notes"]
         elif self.is_member(user, "Student"):  # only update student field
             # unassign
             if "student" not in json_data or json_data["student"] is None and interview.student.email == user.email:
                 interview.student = None
-                interview.save()
             elif json_data["student"] == user.email and interview.student is None:  # assign
                 interview.student = Student.objects.filter(email__exact=user.email).first()
-                interview.save()
         else:
             return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+        interview.save()
         interview.refresh_from_db()
 
         serializer = RetrieveInterviewSerializer(interview)
@@ -249,9 +276,6 @@ class InterviewViewSet(viewsets.GenericViewSet,
         serializer = RetrieveInterviewSerializer(obj)
 
         return HttpResponse(serializer.data, status=status.HTTP_201_CREATED)
-
-    def get_paginated_response(self, data):
-        return Response(data)
 
     def is_member(self, user, group):
         return user.groups.filter(name=group).exists()
