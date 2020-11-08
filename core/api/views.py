@@ -196,6 +196,9 @@ class InterviewViewSet(viewsets.GenericViewSet,
          'DELETE': ['staff'],
      }
 
+    def get_paginated_response(self, data):
+        return Response(data)
+
     def destroy(self, request, *args, **kwargs):
         json_data = request.data
         if "id" not in json_data:
@@ -212,17 +215,18 @@ class InterviewViewSet(viewsets.GenericViewSet,
         user = self.request.user
 
         # If user is staff, show all interviews
-        if self.is_member(user, "Staff"):
-            query_set = Interview.objects.all()
+        if self.is_member(user, "staff"):
+            query_set = Interview.objects.select_related('supervisor', 'student').all()
 
         # If user is student, show relevant interviews (theirs + empty)
-        elif self.is_member(user, "Student"):
-            query_set = Interview.objects.filter(Q(student__isnull=True) | Q(student__email__contains=user.email))
+        elif self.is_member(user, "student"):
+            query_set = Interview.objects.filter(Q(student__isnull=True) | Q(student__email__contains=user.email))\
+                .select_related('supervisor', 'student')
         else:
             query_set = None
 
-        serializer = RetrieveInterviewSerializer(query_set, many=True)
-        return Response(serializer.data)
+        s = RetrieveInterviewSerializer(query_set, many=True)
+        return Response(json.dumps(s.data, cls=UUIDEncoder))
 
     def update(self, request, *args, **kwargs):
         json_data = request.data
@@ -232,22 +236,22 @@ class InterviewViewSet(viewsets.GenericViewSet,
         if "id" not in json_data:
             return HttpResponseBadRequest("Require ID field")
 
-        interview = Interview.objects.filter(id__exact=user.email).first()
+        interview = Interview.objects.filter(id__exact=json_data["id"]).first()
 
         # can update
-        if self.is_member(user, "Staff"):
+        if self.is_member(user, "staff"):
             supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
 
             # dates in iso format
             start_date = parser.parse(json_data["start_date"])
             end_date = parser.parse(json_data["end_date"])
 
-            interview.supervisor = supervisor,
-            interview.title = json_data["title"],
-            interview.start_date = start_date,
-            interview.end_date = end_date,
+            interview.supervisor = supervisor
+            interview.title = json_data["title"]
+            interview.start_date = start_date
+            interview.end_date = end_date
             interview.notes = "" if "notes" not in json_data else json_data["notes"]
-        elif self.is_member(user, "Student"):  # only update student field
+        elif self.is_member(user, "student"):  # only update student field
             # unassign
             if "student" not in json_data or json_data["student"] is None and interview.student.email == user.email:
                 interview.student = None
@@ -258,9 +262,9 @@ class InterviewViewSet(viewsets.GenericViewSet,
         interview.save()
         interview.refresh_from_db()
 
-        serializer = RetrieveInterviewSerializer(interview)
+        s = RetrieveInterviewSerializer(interview)
 
-        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+        return HttpResponse(json.dumps(s.data, cls=UUIDEncoder), status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         json_data = request.data
@@ -283,9 +287,9 @@ class InterviewViewSet(viewsets.GenericViewSet,
             notes="" if "notes" not in json_data else json_data["notes"]
         )
 
-        serializer = RetrieveInterviewSerializer(obj)
+        s = RetrieveInterviewSerializer(obj)
 
-        return HttpResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return HttpResponse(json.dumps(s.data, cls=UUIDEncoder), status=status.HTTP_201_CREATED)
 
     def is_member(self, user, group):
         return user.groups.filter(name=group).exists()

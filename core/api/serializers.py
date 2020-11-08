@@ -7,6 +7,11 @@ class RetrieveStudentSerializer(serializers.ModelSerializer):
         fields = ["id", "given_name", "family_name", "course", "supervisor", "WAM", "credit_points", "email",
                   "interview_set", "placement_set", "application_set"]
 
+class RetrieveBasicStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ["id", "given_name", "family_name", "email"]
+
 class RetrieveCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -16,6 +21,11 @@ class RetrieveSupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supervisor
         fields = ["id", "given_name", "family_name", "student_set", "interview_set", "email"]
+
+class RetrieveBasicSupervisorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supervisor
+        fields = ["id", "given_name", "family_name", "email"]
 
 class RetrievePlacementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,6 +53,9 @@ class RetrieveApplicationSerializer(serializers.ModelSerializer):
         fields = ["status", "student", "date_started", "date_completed", "year_preference","semester_preference"]
 
 class RetrieveInterviewSerializer(serializers.ModelSerializer):
+    supervisor = RetrieveBasicSupervisorSerializer()
+    student = RetrieveBasicStudentSerializer()
+
     class Meta:
         model = Interview
         fields = ["id", "start_date", "end_date", "location", "outcome_details", "student", "application",
