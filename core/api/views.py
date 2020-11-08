@@ -10,7 +10,7 @@ from authentication.api.permissions import HasGroupPermission
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 import datetime
-import dateutil
+from dateutil import parser
 from rest_framework import status
 from django.db.models import Q
 
@@ -197,7 +197,7 @@ class InterviewViewSet(viewsets.GenericViewSet,
      }
 
     def destroy(self, request, *args, **kwargs):
-        json_data = json.loads(request.data)
+        json_data = request.data
         if "id" not in json_data:
             return HttpResponseBadRequest("Require ID field")
         obj = Interview.objects.get(id=json_data["id"])
@@ -225,7 +225,7 @@ class InterviewViewSet(viewsets.GenericViewSet,
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        json_data = json.loads(request.data)
+        json_data = request.data
 
         user = self.request.user
 
@@ -239,8 +239,8 @@ class InterviewViewSet(viewsets.GenericViewSet,
             supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
 
             # dates in iso format
-            start_date = dateutil.parser.parse(json_data["start_date"])
-            end_date = dateutil.parser.parse(json_data["end_date"])
+            start_date = parser.parse(json_data["start_date"])
+            end_date = parser.parse(json_data["end_date"])
 
             interview.supervisor = supervisor,
             interview.title = json_data["title"],
@@ -263,7 +263,7 @@ class InterviewViewSet(viewsets.GenericViewSet,
         return HttpResponse(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        json_data = json.loads(request.data)
+        json_data = request.data
         required_keys = ("start_date", "end_date", "supervisor", "title")
         if not all(key in json_data for key in required_keys):
             # don't have all required keys
@@ -272,8 +272,8 @@ class InterviewViewSet(viewsets.GenericViewSet,
         supervisor = Supervisor.objects.filter(email__exact=str(json_data["supervisor"])).first()
 
         # dates in iso format
-        start_date = dateutil.parser.parse(json_data["start_date"])
-        end_date = dateutil.parser.parse(json_data["end_date"])
+        start_date = parser.parse(json_data["start_date"])
+        end_date = parser.parse(json_data["end_date"])
 
         obj = Interview.objects.create(
             supervisor=supervisor,
