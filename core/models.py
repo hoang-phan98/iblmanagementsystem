@@ -67,8 +67,8 @@ class EligibilityRules(models.Model):
 
 class Application(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    status = models.CharField(max_length=1, default=("I", "Incomplete"), choices=[("I", "Incomplete"),
-                                                                                  ("C", "Completed")])
+    status = models.CharField(max_length=1, choices=[("I", "Incomplete"),
+                                                        ("C", "Completed")])
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date_started = models.DateField(auto_now_add=True)
     date_completed = models.DateField(default=None, blank=True, null=True)
