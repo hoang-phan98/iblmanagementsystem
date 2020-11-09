@@ -152,11 +152,11 @@ class ApplicationViewSet(viewsets.GenericViewSet,
         user = self.request.user
 
         # If user is staff, show all applications
-        if self.is_member(user, "Staff"):
+        if self.is_member(user, "staff"):
             query_set = Application.objects.all()
 
         # If user is student, show relevant application
-        elif self.is_member(user, "Student"):
+        elif self.is_member(user, "student"):
             query_set = Application.objects.filter(student__email__contains=user.email)
 
         else:
@@ -171,12 +171,12 @@ class ApplicationViewSet(viewsets.GenericViewSet,
         user = self.request.user
 
         # If user is staff, show application
-        if self.is_member(user, "Staff"):
+        if self.is_member(user, "staff"):
             query_set = Application.objects.all()
             application = get_object_or_404(query_set, pk=pk)
 
         # If user is student, only show application if relevant
-        elif self.is_member(user, "Student"):
+        elif self.is_member(user, "student"):
             query_set = Application.objects.filter(student__email__contains=user.email)
             application = get_object_or_404(query_set, pk=pk)
         else:
