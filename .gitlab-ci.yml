@@ -45,6 +45,7 @@ stages:
   after_script:
     # - cat ~/.aws/credentials
     - rm ~/.aws/credentials
+    - rm -rf $CI_PROJECT_DIR/env/  # free up venv space
 
 deploy-dev:
   extends: .deploy-base
