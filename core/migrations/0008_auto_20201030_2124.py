@@ -12,35 +12,25 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.DeleteModel(
+            name='Interview',
+        ),
         migrations.CreateModel(
-            name='InterviewSlot',
+            name='Interview',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('date', models.DateTimeField()),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('start_date', models.DateTimeField()),
+                ('end_date', models.DateTimeField()),
+                ('student', models.ForeignKey(on_delete=models.CASCADE, null=True, to='core.Student')),
+                ('supervisor', models.ForeignKey(on_delete=models.CASCADE, to='core.Supervisor')),
+                ('title', models.TextField()),
+                ('notes', models.TextField(blank=True)),
+
+                ('application', models.ForeignKey(on_delete=models.CASCADE, null=True, to='core.Application')),
+                ('location', models.CharField(max_length=256, blank=True)),
+                ('outcome_details',
+                 models.CharField(max_length=1, blank=True, choices=[("S", "Successful"), ("U", "Unsuccessful")])),
+                ('company', models.ForeignKey(on_delete=models.CASCADE, null=True, to='core.Company')),
             ],
-        ),
-        migrations.RemoveField(
-            model_name='interview',
-            name='time',
-        ),
-        migrations.AlterField(
-            model_name='interview',
-            name='company',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='core.Company'),
-        ),
-        migrations.AlterField(
-            model_name='interview',
-            name='location',
-            field=models.CharField(blank=True, max_length=256),
-        ),
-        migrations.AlterField(
-            model_name='interview',
-            name='staff',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='core.Supervisor'),
-        ),
-        migrations.AlterField(
-            model_name='interview',
-            name='student',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='core.Student'),
         ),
     ]
