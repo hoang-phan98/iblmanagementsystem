@@ -162,8 +162,15 @@ class ApplicationViewSet(viewsets.GenericViewSet,
         else:
             query_set = None
 
-        serializer = RetrieveApplicationSerializer(query_set, many=True)
-        return Response(serializer.data)
+        # Embed student in application object
+        # TODO: do this for retrieve with common logic
+        result = []
+        for query in query_set:
+            data = RetrieveApplicationSerializer(query).data
+            data["student"] = RetrieveStudentSerializer(query.student).data
+            result.append(data)
+
+        return Response(result)
 
     def retrieve(self, request, pk=None):
 
