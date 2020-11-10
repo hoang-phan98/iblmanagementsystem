@@ -60,8 +60,6 @@ class RetrieveUnitCourseSerializer(serializers.ModelSerializer):
 
 
 class RetrieveApplicationSerializer(serializers.ModelSerializer):
-    student = RetrieveBasicStudentSerializer()
-
     class Meta:
         model = Application
         fields = "__all__"
