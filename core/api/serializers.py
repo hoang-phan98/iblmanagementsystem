@@ -81,12 +81,6 @@ class RetrieveEligibilityRulesSerializer(serializers.ModelSerializer):
         fields = ["unit"]
 
 
-class RetrieveActivitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Activity
-        fields = ["id"]
-
-
 class RetrieveQuestionnaireTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionnaireTemplate
@@ -109,8 +103,3 @@ class RerieveCourseMapSnapshotSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseMapSnapshot
         fields = ["id", "Snapshot", "application", "approval"]
-
-# class RetrievePrereqConjunction(serializers.ModelSerializer):
-#     class Meta:
-#         model = PrereqConjunction
-#         fields = ["unit_code"]

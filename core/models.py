@@ -59,15 +59,6 @@ class Placement(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
-
-# class PrereqConjunction(models.Model):
-#     class Meta:
-#         unique_together = (('unit_code', 'prereq_unit_code'),)
-
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     unit_code = models.ForeignKey(Unit, on_delete=models.CASCADE)
-#     prereq_unit_code = models.ForeignKey(Unit, on_delete=models.CASCADE)
-
 class EligibilityRules(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
@@ -91,11 +82,6 @@ class Application(models.Model):
     student_response = models.ForeignKey(
         StudentResponse, on_delete=models.CASCADE)
 
-
-class Activity(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-
 class Interview(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start_date = models.DateTimeField()
@@ -113,8 +99,6 @@ class Interview(models.Model):
 
 class QuestionnaireTemplate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # Currently just a TetField to store the JSON. JSONField can be used in Postgres.
-    # Otherwise could also use https://github.com/rpkilby/jsonfield
     questions = models.TextField()
     active = models.BooleanField()
 

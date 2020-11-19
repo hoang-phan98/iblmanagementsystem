@@ -342,22 +342,6 @@ class EligibilityRulesViewSet(viewsets.GenericViewSet,
         return Response(data)
 
 
-class ActivityViewSet(viewsets.GenericViewSet,
-                      mixins.ListModelMixin,
-                      mixins.RetrieveModelMixin):
-    queryset = Activity.objects.all()
-    serializer_class = RetrieveActivitySerializer
-    permission_classes = [HasGroupPermission]
-    required_groups = {
-        'GET': ['student', 'staff'],
-        'POST': ['student', 'staff'],
-        'PUT': ['student', 'staff'],
-    }
-
-    def get_paginated_response(self, data):
-        return Response(data)
-
-
 class QuestionnaireTemplateViewSet(viewsets.GenericViewSet,
                                    mixins.ListModelMixin,
                                    mixins.DestroyModelMixin,
@@ -584,13 +568,3 @@ class CourseMapSnapshotViewset(viewsets.GenericViewSet,
             return ""
         except:
             return "Invalid JSON object or no 'snapshot' key present in object."
-
-# class PrereqConjunctionViewSet(viewsets.GenericViewSet,
-#                    mixins.ListModelMixin,
-#                    mixins.RetrieveModelMixin):
-#
-#     queryset = PrereqConjunction.objects.all()
-#     serializer_class = RetrievePrereqConjunction
-#
-#     def get_paginated_response(self, data):
-#         return Response(data)
