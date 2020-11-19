@@ -28,7 +28,11 @@ stages:
     - source env/bin/activate
     - pip install -r requirements.txt
     # Make Django migrations before deploying package to Lambda
-    - USE_REMOTE_DB=True python manage.py makemigrations  # Need to ensure remote DB is used for this
+    - export USE_REMOTE_DB=True
+    - echo $USE_REMOTE_DB
+    - python manage.py makemigrations  # Need to ensure remote DB is used for this
+    - python manage.py createsu || echo "Superuser creation failed, may already exist"
+    - python manage.py creategroups || echo "Group creation failed, may already exist"
   script:
     # creating aws credentials file
     - mkdir -p ~/.aws
@@ -37,11 +41,11 @@ stages:
     - echo "aws_secret_access_key = "$AWS_SECRET_ACCESS_KEY >> ~/.aws/credentials
     # try to update, if the command fails (probably not even deployed) do the initial deploy
     - zappa update $ZAPPA_STAGE || zappa deploy $ZAPPA_STAGE
-    - zappa manage $ZAPPA_STAGE create_admin_user || echo "Admin user already exists"
     - zappa manage $ZAPPA_STAGE migrate
   after_script:
     # - cat ~/.aws/credentials
     - rm ~/.aws/credentials
+    - rm -rf $CI_PROJECT_DIR/env/  # free up venv space
 
 deploy-dev:
   extends: .deploy-base
