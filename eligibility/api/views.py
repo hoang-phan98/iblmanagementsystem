@@ -3,9 +3,13 @@ from rest_framework import viewsets
 from eligibility.config import MINIMUM_ROUNDED_WAM
 import json
 from core.models import Student
+from core.api.serializers import RetrieveStudentSerializer
 
 
 class WamCheck(viewsets.GenericViewSet):
+
+    queryset = Student.objects.all()
+    serializer_class = RetrieveStudentSerializer
     """
     Pass in Student ID as pk, e.g. /wam/12345678
     If student found, return JSON with student_id and a 'success' Boolean field in 200 Ok
